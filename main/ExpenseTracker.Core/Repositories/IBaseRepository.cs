@@ -1,7 +1,7 @@
 using ExpenseTracker.Core.Models;
-namespace ExpenseTracker.Core.Services;
+namespace ExpenseTracker.Core.Repositories;
 
-public interface IBaseService<T> where T : Base
+public interface IBaseRepository<T> where T : Base
 {
     Task<IEnumerable<T>> GetAllAsync();
     Task<T> GetByIdAsync(int id);
