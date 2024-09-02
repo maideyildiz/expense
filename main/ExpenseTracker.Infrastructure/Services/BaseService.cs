@@ -9,7 +9,7 @@ public class BaseService<T> : IBaseService<T> where T : Base
 
     public BaseService(string collectionName)
     {
-        string pathToCredentials = "path/to/your/credentials.json";
+        string pathToCredentials = "keys/credentials.json";
         Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToCredentials);
         _db = FirestoreDb.Create("your-project-id");
         _collectionName = collectionName;
@@ -22,11 +22,20 @@ public class BaseService<T> : IBaseService<T> where T : Base
         return snapshot.Documents.Select(doc => doc.ConvertTo<T>());
     }
 
-    public async Task<T> GetByIdAsync(int id)
+    public async Task<T?> GetByIdAsync(int id)
     {
+        if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id), id, "Id must be a positive integer");
+
         DocumentReference docRef = _db.Collection(_collectionName).Document(id.ToString());
-        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
-        return snapshot.Exists ? snapshot.ConvertTo<T>() : null;
+        try
+        {
+            DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+            return snapshot.Exists ? snapshot.ConvertTo<T>() : default;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to get {typeof(T).Name} by id {id}", ex);
+        }
     }
 
     public async Task AddAsync(T obj)
