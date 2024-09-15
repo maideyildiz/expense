@@ -2,9 +2,9 @@ using ExpenseTracker.Core.Models;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
-public class ExpenseService : BaseService<Expense>
+public class CategoryService : BaseService<Category>
 {
-    public ExpenseService() : base("Expense")
+    public CategoryService() : base("Category")
     {
     }
 }
