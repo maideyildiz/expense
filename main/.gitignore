@@ -400,5 +400,4 @@ FodyWeavers.xsd
 # Credentials
 ExpenseTracker.Infrastructure/keys/
 .config
-.vscode
 
