@@ -9,9 +9,11 @@ public class BaseService<T> : IBaseService<T> where T : Base
 
     public BaseService(string collectionName)
     {
-        string pathToCredentials = "keys/credentials.json";
-        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToCredentials);
-        _db = FirestoreDb.Create("your-project-id");
+        var configReader = new ConfigReader("keys/credentials.json");
+        JObject firebaseConfig = configReader.ReadConfig();
+        
+        string projectId = firebaseConfig["projectId"].ToString();
+        _db = FirestoreDb.Create(projectId);
         _collectionName = collectionName;
     }
 
