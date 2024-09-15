@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ExpenseTracker.Core.Models;
 
-namespace ExpenseTracker.Infrastructure.Data.Configuration
-{
+namespace ExpenseTracker.Infrastructure.Data.Configuration;
+
     public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
     {
         public void Configure(EntityTypeBuilder<Expense> builder)
@@ -25,4 +25,4 @@ namespace ExpenseTracker.Infrastructure.Data.Configuration
                 .OnDelete(DeleteBehavior.Cascade); 
         }
     }
-}
+

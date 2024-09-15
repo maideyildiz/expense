@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ExpenseTracker.Core.Models;
+using ExpenseTracker.Infrastructure.Data.Configuration;
 
-namespace ExpenseTracker.Infrastructure.Data
-{
+namespace ExpenseTracker.Infrastructure.Data;
+
     public class ExpenseTrackerDbContext : DbContext
     {
         public DbSet<Expense> Expenses { get; set; }
@@ -20,4 +22,4 @@ namespace ExpenseTracker.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
         }
     }
-}
+
