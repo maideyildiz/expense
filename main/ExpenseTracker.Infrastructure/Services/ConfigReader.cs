@@ -1,8 +1,8 @@
 using System.IO;
 using Newtonsoft.Json.Linq;
 
-namespace ExpenseTracker.Infrastructure.Services
-{
+namespace ExpenseTracker.Infrastructure.Services;
+
     public class ConfigReader
     {
         private readonly string _filePath;
@@ -21,4 +21,4 @@ namespace ExpenseTracker.Infrastructure.Services
             return JObject.Parse(json);
         }
     }
-}
+

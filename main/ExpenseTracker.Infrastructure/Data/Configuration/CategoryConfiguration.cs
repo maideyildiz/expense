@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ExpenseTracker.Core.Models;
 
-namespace ExpenseTracker.Infrastructure.Data.Configuration
-{
+namespace ExpenseTracker.Infrastructure.Data.Configuration;
     public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         public void Configure(EntityTypeBuilder<Category> builder)
@@ -26,4 +26,4 @@ namespace ExpenseTracker.Infrastructure.Data.Configuration
                 .OnDelete(DeleteBehavior.Cascade);  
         }
     }
-}
+
