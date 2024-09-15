@@ -6,6 +6,7 @@ public class CategoryService : BaseService<Category>
 {
     public CategoryService() : base("Category")
     {
+        //git check
     }
 }
 
