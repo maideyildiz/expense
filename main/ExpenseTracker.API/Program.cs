@@ -2,8 +2,15 @@ using ExpenseTracker.Infrastructure.Services;
 using ExpenseTracker.Infrastructure.Data.DbSettings;
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<DbOptions>(builder.Configuration);
-// Add services to the container.
+var config = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var dbOptions = new DbOptions(config);
+
+builder.Services.AddSingleton<IMongoDbContext>(provider => new MongoDbContext(dbOptions));
+
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
 // Configure Swagger/OpenAPI

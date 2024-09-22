@@ -5,7 +5,7 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class CategoryService : BaseService<Category>
 {
-    public CategoryService(DbOptions dbOptions) : base(dbOptions, "Category")
+    public CategoryService(IMongoDbContext context) : base(context, "Category")
     {
     }
 }
