@@ -1,7 +1,8 @@
 using ExpenseTracker.Infrastructure.Services;
-
+using ExpenseTracker.Infrastructure.Data.DbSettings;
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<DbOptions>(builder.Configuration);
 // Add services to the container.
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
