@@ -3,6 +3,6 @@ namespace ExpenseTracker.Core.Repositories;
 
 public interface IUserRepository : IBaseRepository<User>
 {
-    Task RegisterAsync(User user);
+    Task<bool> RegisterAsync(User user);
     Task<User?> LoginAsync(string email, string password);
 }

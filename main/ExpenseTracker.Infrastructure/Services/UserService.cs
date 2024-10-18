@@ -13,7 +13,7 @@ public class UserService : BaseService<User>, IUserRepository
     {
         _users = context.GetCollection<User>("User");
     }
-    public async Task RegisterAsync(User user)
+    public async Task<bool> RegisterAsync(User user)
     {
         if (user is null)
             throw new ArgumentNullException(nameof(user), $"{nameof(user)} is null.");
@@ -32,10 +32,25 @@ public class UserService : BaseService<User>, IUserRepository
         {
             throw new InvalidOperationException("Email already exists.");
         }
+        try
+        {
+            user.Password = PasswordHasher.HashPassword(user.Password);
 
-        user.Password = PasswordHasher.HashPassword(user.Password);
+            await _users.InsertOneAsync(user);
 
-        await _users.InsertOneAsync(user);
+            // 5. İşlem başarılıysa true dön.
+            return true;
+        }
+        catch (MongoException ex)
+        {
+            Console.WriteLine($"MongoDB Error: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"General Error: {ex.Message}");
+            return false;
+        }
     }
 
     public async Task<User?> LoginAsync(string email, string password)

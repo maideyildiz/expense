@@ -1,18 +1,13 @@
 using Moq;
-using Xunit;
-using System.Threading.Tasks;
 using ExpenseTracker.Core.Models;
 using ExpenseTracker.Infrastructure.Services;
 using ExpenseTracker.Infrastructure.Data.DbSettings;
 using MongoDB.Driver;
-using System.Collections.Generic;
-
-namespace ExpenseTracker.Tests.UnitTests.Services;
-
+namespace ExpenseTracker.Tests.UserTests;
 public class UserServiceTests
 {
     private readonly Mock<IMongoDbContext> _mockContext;
-    private readonly Mock<IMongoCollection<User>> _mockUserCollection;
+    private readonly Mock<IMongoCollection<ExpenseTracker.Core.Models.User>> _mockUserCollection;
     private readonly UserService _userService;
 
     public UserServiceTests()
@@ -44,6 +39,7 @@ public class UserServiceTests
         await Assert.ThrowsAsync<ArgumentException>(() => _userService.RegisterAsync(newUser));
     }
 
+    [Fact]
     public async Task RegisterAsync_Should_ThrowArgumentException_When_UserEmailIsAlreadyTaken()
     {
         // Arrange
@@ -103,31 +99,33 @@ public class UserServiceTests
         // Act and Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.LoginAsync(user.Email, user.Password));
     }
-
     [Fact]
     public async Task RegisterAsync_Should_RegisterUser_When_DataIsValid()
     {
         // Arrange
-        var newUser = new User { Email = "testuser@example.com", Password = "hashed_password" };
+        var validUser = new User
+        {
+            Email = "test@example.com",
+            Password = "hashedPassword" // Assume this is a hashed password.
+        };
 
-        // Mocking the Find method to return an IFindFluent<User, User>
-        var mockFindFluent = new Mock<IFindFluent<User, User>>();
+        // Mock the behavior of the _mockUserCollection
+        _mockUserCollection.Setup(c => c.Find(It.IsAny<FilterDefinition<User>>(), null))
+            .Returns((IFindFluent<User, User>)new Mock<IAsyncCursor<User>>().Object); // Simulate an empty cursor
 
-        // Set up the ToListAsync() method on the IFindFluent mock
-        mockFindFluent.Setup(m => m.ToListAsync(default))
-            .ReturnsAsync(new List<User>()); // Boş bir kullanıcı listesi döndürüyoruz
+        _mockUserCollection.Setup(c => c.InsertOneAsync(It.IsAny<User>(), null, default))
+            .Returns(Task.CompletedTask);  // Simulate successful insert
 
-        _mockUserCollection.Setup(repo => repo.Find(It.IsAny<FilterDefinition<User>>(), null))
-            .Returns(mockFindFluent.Object); // Mock FindFluent nesnesini döndürüyoruz
+        // Setup the context to return the mock user collection
+        _mockContext.Setup(c => c.GetCollection<User>("User")).Returns(_mockUserCollection.Object);
 
         // Act
-        await _userService.RegisterAsync(newUser);
+        var result = await _userService.RegisterAsync(validUser);
 
         // Assert
-        _mockUserCollection.Verify(m => m.InsertOneAsync(It.IsAny<User>(), null, default), Times.Once);
+        Assert.True(result); // Ensure registration is successful
+        _mockUserCollection.Verify(c => c.InsertOneAsync(It.Is<User>(u => u.Email == validUser.Email), null, default), Times.Once);
     }
-
-
 
 
 }
