@@ -8,11 +8,9 @@ public class BaseService<T> : IBaseService<T> where T : Base
 {
     protected readonly IMongoCollection<T> _collection;
 
-    public BaseService(DbOptions dbOptions, string collectionName)
+    public BaseService(IMongoDbContext context, string collectionName)
     {
-        var client = new MongoClient(dbOptions.ConnectionString);
-        var database = client.GetDatabase(dbOptions.DatabaseName);
-        _collection = database.GetCollection<T>(collectionName);
+        _collection = context.GetCollection<T>(collectionName);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
