@@ -1,38 +1,70 @@
 using ExpenseTracker.Core.Models;
-using ExpenseTracker.Core.Repositories;
 using MongoDB.Driver;
 using ExpenseTracker.Infrastructure.Data.DbSettings;
 using ExpenseTracker.Infrastructure.Helpers;
+using ExpenseTracker.Core.Repositories;
 
 namespace ExpenseTracker.Infrastructure.Services;
 public class UserService : BaseService<User>, IUserRepository
 {
     private readonly IMongoCollection<User> _users;
 
-    public UserService(DbOptions dbOptions) : base(dbOptions, "User")
+    public UserService(IMongoDbContext context) : base(context, "User")
     {
-        _users = _collection;
+        _users = context.GetCollection<User>("User");
     }
-    public async Task RegisterAsync(User user)
+    public async Task<bool> RegisterAsync(User user)
     {
-        var existingUser = await _users.Find(u => u.Username == user.Username).FirstOrDefaultAsync();
+        if (user is null)
+            throw new ArgumentNullException(nameof(user), $"{nameof(user)} is null.");
+
+
+        if (string.IsNullOrWhiteSpace(user.Email))
+            throw new ArgumentException($"Email address is invalid.", nameof(user.Email));
+
+
+        if (string.IsNullOrWhiteSpace(user.Password))
+            throw new ArgumentException($"Password is invalid.", nameof(user.Password));
+
+
+        var existingUser = await _users.Find(u => u.Email == user.Email).FirstOrDefaultAsync();
         if (existingUser != null)
         {
-            throw new InvalidOperationException("Username already exists.");
+            throw new InvalidOperationException("Email already exists.");
         }
+        try
+        {
+            user.Password = PasswordHasher.HashPassword(user.Password);
 
-        user.Password = PasswordHasher.HashPassword(user.Password);
+            await _users.InsertOneAsync(user);
 
-        await _users.InsertOneAsync(user);
+            // 5. İşlem başarılıysa true dön.
+            return true;
+        }
+        catch (MongoException ex)
+        {
+            Console.WriteLine($"MongoDB Error: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"General Error: {ex.Message}");
+            return false;
+        }
     }
 
-    public async Task<User?> LoginAsync(string username, string password)
+    public async Task<User?> LoginAsync(string email, string password)
     {
-        var user = await _users.Find(u => u.Username == username).FirstOrDefaultAsync();
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentNullException(nameof(email));
+
+        if (string.IsNullOrWhiteSpace(password))
+            throw new ArgumentNullException(nameof(password));
+
+        var user = await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+
         if (user == null)
-        {
-            return null;
-        }
+            throw new ArgumentNullException(nameof(user)); // Burada daha açıklayıcı bir hata fırlatabilirsiniz
 
         var hashedInputPassword = PasswordHasher.HashPassword(password);
         if (PasswordHasher.VerifyPassword(hashedInputPassword, user.Password))
