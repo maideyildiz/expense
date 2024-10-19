@@ -1,4 +1,4 @@
-using ExpenseTracker.Core.Repositories.Abstractions;
+using ExpenseTracker.Core.Repositories;
 namespace ExpenseTracker.Infrastructure.Abstractions;
 
 public interface IUserService : IUserRepository

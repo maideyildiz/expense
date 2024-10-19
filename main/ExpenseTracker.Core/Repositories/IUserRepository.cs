@@ -1,5 +1,5 @@
 using ExpenseTracker.Core.Models;
-namespace ExpenseTracker.Core.Repositories.Abstractions;
+namespace ExpenseTracker.Core.Repositories;
 
 public interface IUserRepository : IBaseRepository<User>
 {
