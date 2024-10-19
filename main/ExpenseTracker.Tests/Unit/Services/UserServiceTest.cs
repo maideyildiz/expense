@@ -3,6 +3,7 @@ using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Services;
 using Moq;
 
+namespace ExpenseTracker.Tests.Unit.Services;
 public class UserServiceTests
 {
     private readonly Mock<IDatabaseConnection> _mockDatabaseConnection;
@@ -63,5 +64,21 @@ public class UserServiceTests
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_ReturnsAffectedRows_WhenUserIsUpdated()
+    {
+        // Arrange
+        var user = new User { Id = Guid.NewGuid(), Name = "Updated User", Email = "updated@example.com", Password = "updatedpassword123" };
+        _mockDatabaseConnection.Setup(db => db.ExecuteAsync(
+            It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _userService.UpdateAsync(user);
+
+        // Assert
+        Assert.Equal(1, result);
     }
 }
