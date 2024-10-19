@@ -42,11 +42,11 @@ public class CategoryServiceTests
             .ReturnsAsync(categories);
 
         // Act
-        var result = await _categoryService.GetAsync();
+        var result = await _categoryService.GetAllAsync();
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Equal(2, result.Count);
+        Assert.Equal(2, result.Count());
     }
 
     [Fact]
