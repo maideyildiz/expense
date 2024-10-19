@@ -1,50 +1,54 @@
+using System.Data;
+using Dapper;
 using ExpenseTracker.Core.Models;
-using MongoDB.Driver;
-using ExpenseTracker.Infrastructure.Data.DbSettings;
+using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Helpers;
-using ExpenseTracker.Core.Repositories;
 
 namespace ExpenseTracker.Infrastructure.Services;
-public class UserService : BaseService<User>, IUserRepository
-{
-    private readonly IMongoCollection<User> _users;
 
-    public UserService(IMongoDbContext context) : base(context, "User")
+public class UserService : BaseService<User>, IUserService
+{
+    private readonly IDatabaseConnection _dbConnection;
+
+    public UserService(IDatabaseConnection dbConnection) : base(dbConnection, "User")
     {
-        _users = context.GetCollection<User>("User");
+        _dbConnection = dbConnection;
     }
+
     public async Task<bool> RegisterAsync(User user)
     {
         if (user is null)
             throw new ArgumentNullException(nameof(user), $"{nameof(user)} is null.");
 
-
         if (string.IsNullOrWhiteSpace(user.Email))
             throw new ArgumentException($"Email address is invalid.", nameof(user.Email));
-
 
         if (string.IsNullOrWhiteSpace(user.Password))
             throw new ArgumentException($"Password is invalid.", nameof(user.Password));
 
+        // Mevcut kullanıcı kontrolü
+        var existingUser = await _dbConnection.QueryFirstOrDefaultAsync<User>(
+            "SELECT * FROM User WHERE Email = @Email",
+            new { Email = user.Email });
 
-        var existingUser = await _users.Find(u => u.Email == user.Email).FirstOrDefaultAsync();
         if (existingUser != null)
         {
             throw new InvalidOperationException("Email already exists.");
         }
+
         try
         {
             user.Password = PasswordHasher.HashPassword(user.Password);
 
-            await _users.InsertOneAsync(user);
+            var query = @"INSERT INTO User (Id, Email, Password) VALUES (@Id, @Email, @Password)";
+            await _dbConnection.ExecuteAsync(query, new
+            {
+                Id = user.Id,
+                user.Email,
+                user.Password
+            });
 
-            // 5. İşlem başarılıysa true dön.
             return true;
-        }
-        catch (MongoException ex)
-        {
-            Console.WriteLine($"MongoDB Error: {ex.Message}");
-            return false;
         }
         catch (Exception ex)
         {
@@ -61,19 +65,19 @@ public class UserService : BaseService<User>, IUserRepository
         if (string.IsNullOrWhiteSpace(password))
             throw new ArgumentNullException(nameof(password));
 
-        var user = await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
+        var user = await _dbConnection.QueryFirstOrDefaultAsync<User>(
+            "SELECT * FROM User WHERE Email = @Email",
+            new { Email = email });
 
         if (user == null)
-            throw new ArgumentNullException(nameof(user)); // Burada daha açıklayıcı bir hata fırlatabilirsiniz
+            throw new ArgumentNullException(nameof(user));
 
-        var hashedInputPassword = PasswordHasher.HashPassword(password);
-        if (PasswordHasher.VerifyPassword(hashedInputPassword, user.Password))
+        if (!PasswordHasher.VerifyPassword(password, user.Password))
         {
             return null;
         }
 
         return user;
     }
-
 }
 
