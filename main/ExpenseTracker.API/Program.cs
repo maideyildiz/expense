@@ -1,28 +1,20 @@
-using System.Data;
-using ExpenseTracker.Infrastructure.Abstractions;
-using ExpenseTracker.Infrastructure.Services;
-using MySqlConnector;
+using ExpenseTracker.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var config = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json")
-    .Build();
+// Bağımlılıkları tek bir yerden yükle
+builder.Services.AddProjectDependencies(builder.Configuration);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.AddTransient<IDbConnection>(sp => new MySqlConnection(connectionString));
-
-builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-
-// Configure Swagger/OpenAPI
+// Swagger/OpenAPI ekle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Controller'ları ekle
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Geliştirme ortamında Swagger UI kullan
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -30,9 +22,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Map your endpoints here, e.g., app.MapControllers() if you are using controllers
-app.MapGet("/", () => "Hello World!");
+app.MapControllers();
 
 app.Run();
-
