@@ -3,6 +3,7 @@ using MySqlConnector;
 using Dapper;
 using ExpenseTracker.Infrastructure.Abstractions;
 
+namespace ExpenseTracker.Infrastructure.Services;
 public class DatabaseConnection : IDatabaseConnection
 {
     private readonly string _connectionString;

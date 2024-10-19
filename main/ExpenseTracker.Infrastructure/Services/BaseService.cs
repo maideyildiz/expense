@@ -28,15 +28,18 @@ public class BaseService<T> : IBaseService<T> where T : Base
 
     public async Task<int> AddAsync(T obj)
     {
-        string sql = "INSERT INTO " + typeof(T).Name + "s (/* column names */) VALUES (/* values */)";
+        var (columnNames, parameterNames, _) = Base.GetInsertAndUpdateColumns<T>();
+        string sql = $"INSERT INTO {typeof(T).Name}s ({columnNames}) VALUES ({parameterNames})";
         return await _databaseConnection.ExecuteAsync(sql, obj);
     }
 
     public async Task<int> UpdateAsync(T obj)
     {
-        string sql = "UPDATE " + typeof(T).Name + "s SET /* column = value */ WHERE Id = @Id";
+        var (_, _, setClause) = Base.GetInsertAndUpdateColumns<T>();
+        string sql = $"UPDATE {typeof(T).Name}s SET {setClause} WHERE Id = @Id";
         return await _databaseConnection.ExecuteAsync(sql, obj);
     }
+
 
     public async Task<int> DeleteAsync(Guid id)
     {
