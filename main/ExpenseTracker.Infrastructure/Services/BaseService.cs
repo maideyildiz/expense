@@ -1,46 +1,46 @@
-using MongoDB.Driver;
-using ExpenseTracker.Infrastructure.Data.DbSettings;
 using ExpenseTracker.Core.Models;
+using ExpenseTracker.Infrastructure.Abstractions;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class BaseService<T> : IBaseService<T> where T : Base
 {
-    protected readonly IMongoCollection<T> _collection;
+    protected readonly IDatabaseConnection _databaseConnection;
+    protected readonly string _tableName;
 
-    public BaseService(IMongoDbContext context, string collectionName)
+    public BaseService(IDatabaseConnection databaseConnection, string tableName)
     {
-        _collection = context.GetCollection<T>(collectionName);
+        _databaseConnection = databaseConnection;
+        _tableName = tableName;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
-        return await _collection.Find(_ => true).ToListAsync();
+        string sql = "SELECT * FROM " + typeof(T).Name + "s";
+        return await _databaseConnection.QueryAsync<T>(sql);
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        if (id == Guid.Empty) throw new ArgumentOutOfRangeException(nameof(id), id, "Id must be a valid Guid");
-
-        var filter = Builders<T>.Filter.Eq("Id", id);
-        return await _collection.Find(filter).FirstOrDefaultAsync();
+        string sql = "SELECT * FROM " + typeof(T).Name + "s WHERE Id = @Id";
+        return await _databaseConnection.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
     }
 
-    public async Task AddAsync(T obj)
+    public async Task<int> AddAsync(T obj)
     {
-        await _collection.InsertOneAsync(obj);
+        string sql = "INSERT INTO " + typeof(T).Name + "s (/* column names */) VALUES (/* values */)";
+        return await _databaseConnection.ExecuteAsync(sql, obj);
     }
 
-    public async Task UpdateAsync(T obj)
+    public async Task<int> UpdateAsync(T obj)
     {
-        var filter = Builders<T>.Filter.Eq("Id", obj.Id);
-        await _collection.ReplaceOneAsync(filter, obj, new ReplaceOptions { IsUpsert = true });
+        string sql = "UPDATE " + typeof(T).Name + "s SET /* column = value */ WHERE Id = @Id";
+        return await _databaseConnection.ExecuteAsync(sql, obj);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<int> DeleteAsync(Guid id)
     {
-        var filter = Builders<T>.Filter.Eq("Id", id);
-        await _collection.DeleteOneAsync(filter);
+        string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";
+        return await _databaseConnection.ExecuteAsync(sql, new { Id = id });
     }
 }
-

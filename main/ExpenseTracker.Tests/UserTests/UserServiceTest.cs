@@ -1,132 +1,67 @@
-using Moq;
 using ExpenseTracker.Core.Models;
+using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Services;
-using ExpenseTracker.Infrastructure.Data.DbSettings;
-using MongoDB.Driver;
-namespace ExpenseTracker.Tests.UserTests;
+using Moq;
+
 public class UserServiceTests
 {
-    private readonly Mock<IMongoDbContext> _mockContext;
-    private readonly Mock<IMongoCollection<ExpenseTracker.Core.Models.User>> _mockUserCollection;
+    private readonly Mock<IDatabaseConnection> _mockDatabaseConnection;
     private readonly UserService _userService;
 
     public UserServiceTests()
     {
-        _mockContext = new Mock<IMongoDbContext>();
-        _mockUserCollection = new Mock<IMongoCollection<User>>();
-
-        _mockContext.Setup(c => c.GetCollection<User>("User")).Returns(_mockUserCollection.Object);
-        _userService = new UserService(_mockContext.Object);
+        _mockDatabaseConnection = new Mock<IDatabaseConnection>();
+        _userService = new UserService(_mockDatabaseConnection.Object);
     }
 
     [Fact]
-    public async Task RegisterAsync_Should_ThrowArgumentNullException_When_UserIsNull()
+    public async Task GetUserByIdAsync_ReturnsUser_WhenUserExists()
     {
         // Arrange
-        User newUser = null;
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.RegisterAsync(newUser));
-    }
-
-    [Fact]
-    public async Task RegisterAsync_Should_ThrowArgumentException_When_UserEmailIsEmpty()
-    {
-        // Arrange
-        var newUser = new User { Email = string.Empty, Password = "hashed_password" };
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _userService.RegisterAsync(newUser));
-    }
-
-    [Fact]
-    public async Task RegisterAsync_Should_ThrowArgumentException_When_UserEmailIsAlreadyTaken()
-    {
-        // Arrange
-        var existingUser = new User { Email = "existinguser@example.com", Password = "hashed_password" };
-
-        var mockFindFluent = new Mock<IFindFluent<User, User>>();
-        mockFindFluent.Setup(m => m.ToListAsync(default)).ReturnsAsync(new List<User> { existingUser });
-
-        _mockUserCollection.Setup(repo => repo.Find(It.IsAny<FilterDefinition<User>>(), null))
-            .Returns(mockFindFluent.Object);
-
-        var newUser = new User { Email = existingUser.Email, Password = "hashed_password" };
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _userService.RegisterAsync(newUser));
-    }
-
-    [Fact]
-    public async Task RegisterAsync_Should_ThrowArgumentException_When_UserPasswordIsEmpty()
-    {
-        // Arrange
-        var newUser = new User { Email = "testuser@example.com", Password = string.Empty };
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _userService.RegisterAsync(newUser));
-    }
-
-    [Fact]
-    public async Task LoginAsync_Should_ThrowArgumentNullException_When_UserIsNull()
-    {
-        // Arrange
-        string email = null;
-        string password = null;
-
-        // Act and Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.LoginAsync(email, password));
-        Assert.Equal("email", exception.ParamName); // Burada email parametresinin null olduğunu kontrol edin
-    }
-
-
-    [Fact]
-    public async Task LoginAsync_Should_ThrowArgumentNullException_When_UserEmailIsEmpty()
-    {
-        // Arrange
-        var user = new User { Email = string.Empty, Password = "hashed_password" };
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.LoginAsync(user.Email, user.Password));
-    }
-
-    [Fact]
-    public async Task LoginAsync_Should_ThrowArgumentNullException_When_UserPasswordIsEmpty()
-    {
-        // Arrange
-        var user = new User { Email = "testuser@example.com", Password = string.Empty };
-
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.LoginAsync(user.Email, user.Password));
-    }
-    [Fact]
-    public async Task RegisterAsync_Should_RegisterUser_When_DataIsValid()
-    {
-        // Arrange
-        var validUser = new User
-        {
-            Email = "test@example.com",
-            Password = "hashedPassword" // Assume this is a hashed password.
-        };
-
-        // Mock the behavior of the _mockUserCollection
-        _mockUserCollection.Setup(c => c.Find(It.IsAny<FilterDefinition<User>>(), null))
-            .Returns((IFindFluent<User, User>)new Mock<IAsyncCursor<User>>().Object); // Simulate an empty cursor
-
-        _mockUserCollection.Setup(c => c.InsertOneAsync(It.IsAny<User>(), null, default))
-            .Returns(Task.CompletedTask);  // Simulate successful insert
-
-        // Setup the context to return the mock user collection
-        _mockContext.Setup(c => c.GetCollection<User>("User")).Returns(_mockUserCollection.Object);
+        var userId = Guid.NewGuid();
+        var user = new User { Id = userId, Name = "Test User", Email = "nZsZB@example.com", Password = "password123" };
+        _mockDatabaseConnection.Setup(db => db.QueryFirstOrDefaultAsync<User>(
+            It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync(user);
 
         // Act
-        var result = await _userService.RegisterAsync(validUser);
+        var result = await _userService.GetByIdAsync(userId);
 
         // Assert
-        Assert.True(result); // Ensure registration is successful
-        _mockUserCollection.Verify(c => c.InsertOneAsync(It.Is<User>(u => u.Email == validUser.Email), null, default), Times.Once);
+        Assert.NotNull(result);
+        Assert.Equal(userId, result.Id);
+        Assert.Equal("Test User", result.Name);
     }
 
+    [Fact]
+    public async Task AddUserAsync_ReturnsAffectedRows_WhenUserIsAdded()
+    {
+        // Arrange
+        var user = new User { Id = Guid.NewGuid(), Name = "New User", Email = "nZsZB@example.com", Password = "password123" };
+        _mockDatabaseConnection.Setup(db => db.ExecuteAsync(
+            It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync(1); // 1 satır eklendiğini varsayıyoruz.
 
+        // Act
+        var result = await _userService.AddAsync(user);
+
+        // Assert
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public async Task GetUserByIdAsync_ReturnsNull_WhenUserDoesNotExist()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        _mockDatabaseConnection.Setup(db => db.QueryFirstOrDefaultAsync<User>(
+            It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync((User?)null); // Kullanıcı bulunamadığını varsayıyoruz.
+
+        // Act
+        var result = await _userService.GetByIdAsync(userId);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
-

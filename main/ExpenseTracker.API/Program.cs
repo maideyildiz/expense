@@ -1,5 +1,8 @@
+using System.Data;
+using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Services;
-using ExpenseTracker.Infrastructure.Data.DbSettings;
+using MySqlConnector;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var config = new ConfigurationBuilder()
@@ -7,9 +10,9 @@ var config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .Build();
 
-var dbOptions = new DbOptions(config);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddSingleton<IMongoDbContext>(provider => new MongoDbContext(dbOptions));
+builder.Services.AddTransient<IDbConnection>(sp => new MySqlConnection(connectionString));
 
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 

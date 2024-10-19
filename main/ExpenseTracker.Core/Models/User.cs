@@ -1,5 +1,3 @@
-using ExpenseTracker.Core.Models;
-
 namespace ExpenseTracker.Core.Models;
 public class User : Base
 {
