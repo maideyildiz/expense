@@ -36,5 +36,19 @@ namespace ExpenseTracker.API.Controllers
             var user = await _mediator.Send(request);
             return Ok(user);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(Guid id, [FromBody] UpdateUserCommand request)
+        {
+            var user = await _mediator.Send(request);
+            return Ok(user);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(DeleteUserCommand request)
+        {
+            await _mediator.Send(request);
+            return NoContent();
+        }
     }
 }
