@@ -1,4 +1,4 @@
-# ExpenseTracker API
+# ExpenseTracker
 
 ExpenseTracker is a versatile expense tracking application currently focused on its API component. The goal is to expand its functionalities to include a frontend for both mobile (iOS/Android) and desktop platforms. The application will support image recognition for receipts and voice input for recording expenses.
 
