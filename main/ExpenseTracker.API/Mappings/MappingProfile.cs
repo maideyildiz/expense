@@ -1,4 +1,4 @@
-using ExpenseTracker.API.DTOs;
+using ExpenseTracker.API.DTOs.User;
 using ExpenseTracker.Core.Models;
 using Mapster;
 
@@ -21,6 +21,7 @@ public class MappingProfile
     {
         TypeAdapterConfig<User, GetUserListQueryResult>
             .NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Surname, src => src.Surname)
             .Map(dest => dest.Email, src => src.Email);
@@ -30,6 +31,7 @@ public class MappingProfile
     {
         TypeAdapterConfig<User, GetUserByIdQueryResult>
             .NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Surname, src => src.Surname)
             .Map(dest => dest.Email, src => src.Email);

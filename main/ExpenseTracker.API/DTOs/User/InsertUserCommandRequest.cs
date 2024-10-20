@@ -1,4 +1,4 @@
-namespace ExpenseTracker.API.DTOs;
+namespace ExpenseTracker.API.DTOs.User;
 public class InsertUserCommandRequest
 {
     public required string Email { get; set; }

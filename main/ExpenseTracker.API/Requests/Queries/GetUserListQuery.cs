@@ -1,4 +1,4 @@
-using ExpenseTracker.API.DTOs;
+using ExpenseTracker.API.DTOs.User;
 using MediatR;
 
 namespace ExpenseTracker.API.Requests.Queries;
