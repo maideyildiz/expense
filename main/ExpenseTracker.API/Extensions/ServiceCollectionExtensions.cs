@@ -1,6 +1,7 @@
 using System.Data;
 using System.Reflection;
 using System.Text;
+using ExpenseTracker.API.Mappings;
 using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Abstractions.Auth;
 using ExpenseTracker.Infrastructure.Services;
@@ -15,21 +16,23 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddProjectDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        // MediatR ekleniyor
+        // MediatR'ı ekle
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
 
-        // MySQL bağlantısı ayarlanıyor
+        // MySQL bağlantısını ekle
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new ArgumentException("The connection string 'DefaultConnection' is not configured.");
         }
 
-        // Veritabanı bağlantıları ekleniyor
+        // Register IDatabaseConnection with the connection string
+        services.AddScoped<IDatabaseConnection>(sp => new DatabaseConnection(connectionString));
+
+        // Register IDbConnection
         services.AddTransient<IDbConnection>(sp => new MySqlConnection(connectionString));
 
-        // JWT ayarları
-        var jwtKey = configuration["Jwt:Key"];
+        var jwtKey = configuration["JwtSettings:SecretKey"];
         if (string.IsNullOrEmpty(jwtKey))
         {
             throw new ArgumentException("JWT key is not configured.");
@@ -44,18 +47,21 @@ public static class ServiceCollectionExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                     ClockSkew = TimeSpan.Zero // Token süresi hassasiyeti için
                 };
             });
 
-        // Servis bağımlılıkları ekleniyor
+        MapsterConfiguration.RegisterMappings();
+        // Servisleri ekle
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
+
         return services;
     }
+
 }
