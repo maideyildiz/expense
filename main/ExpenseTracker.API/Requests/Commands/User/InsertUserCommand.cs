@@ -3,4 +3,4 @@ using MediatR;
 
 namespace ExpenseTracker.API.Requests.Commands.User;
 
-public record InsertUserCommand(InsertUserCommandRequest Request) : IRequest<InsertUserCommandResult>;
+public record InsertUserCommand(InsertUserCommandRequest Request) : IRequest<string>;

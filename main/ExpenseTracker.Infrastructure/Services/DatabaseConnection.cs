@@ -3,76 +3,80 @@ using MySqlConnector;
 using Dapper;
 using ExpenseTracker.Infrastructure.Abstractions;
 
-namespace ExpenseTracker.Infrastructure.Services;
-public class DatabaseConnection : IDatabaseConnection
+namespace ExpenseTracker.Infrastructure.Services
 {
-    private readonly string _connectionString;
-
-    public DatabaseConnection(string connectionString)
+    public class DatabaseConnection : IDatabaseConnection
     {
-        _connectionString = connectionString;
-    }
+        private readonly string _connectionString;
 
-    private IDbConnection CreateConnection()
-    {
-        var connection = new MySqlConnection(_connectionString);
-        connection.Open();
-        return connection;
-    }
-
-    public async Task<int> ExecuteAsync(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public DatabaseConnection(string connectionString)
         {
-            return await connection.ExecuteAsync(sql, param);
+            _connectionString = connectionString;
         }
-    }
 
-    public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        private IDbConnection CreateConnection()
         {
-            return await connection.QueryFirstOrDefaultAsync<T>(sql, param);
+            var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            return connection;
         }
-    }
 
-    public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public async Task<int> ExecuteAsync(string sql, object? param = null)
         {
-            return await connection.QueryAsync<T>(sql, param);
+            using (var connection = CreateConnection())
+            {
+                return await connection.ExecuteAsync(sql, param);
+            }
         }
-    }
 
-    public async Task<T> QuerySingleAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null)
         {
-            return await connection.QuerySingleAsync<T>(sql, param);
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryFirstOrDefaultAsync<T>(sql, param);
+            }
         }
-    }
 
-    public async Task<IEnumerable<T>> QueryMultipleAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
         {
-            return (IEnumerable<T>)await connection.QueryMultipleAsync(sql, param);
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryAsync<T>(sql, param);
+            }
         }
-    }
 
-    public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public async Task<T> QuerySingleAsync<T>(string sql, object? param = null)
         {
-            return await connection.QuerySingleOrDefaultAsync<T>(sql, param);
+            using (var connection = CreateConnection())
+            {
+                return await connection.QuerySingleAsync<T>(sql, param);
+            }
         }
-    }
 
-    public async Task<int> ExecuteScalarAsync<T>(string sql, object? param = null)
-    {
-        using (var connection = CreateConnection())
+        public async Task<IEnumerable<T>> QueryMultipleAsync<T>(string sql, object? param = null)
         {
-            return await connection.ExecuteScalarAsync<int>(sql, param);
+            using (var connection = CreateConnection())
+            {
+                return (IEnumerable<T>)await connection.QueryMultipleAsync(sql, param);
+            }
+        }
+
+        public async Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
+        {
+            using (var connection = CreateConnection())
+            {
+                var result = await connection.QuerySingleOrDefaultAsync<T>(sql, param);
+                return result != null ? result : default;
+            }
+        }
+
+
+        public async Task<int> ExecuteScalarAsync<T>(string sql, object? param = null)
+        {
+            using (var connection = CreateConnection())
+            {
+                return await connection.ExecuteScalarAsync<int>(sql, param);
+            }
         }
     }
 }

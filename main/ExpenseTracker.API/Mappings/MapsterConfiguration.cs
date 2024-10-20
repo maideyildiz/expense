@@ -4,17 +4,19 @@ using Mapster;
 
 namespace ExpenseTracker.API.Mappings;
 
-public class MappingProfile
+public class MapsterConfiguration
 {
     public static void RegisterMappings()
     {
         RegisterUserListMapping();
         RegisterUserMapping();
         RegisterInsertUserRequestMapping();
-        RegisterInsertUserMapping();
+        //RegisterInsertUserResultMapping();
         RegisterUpdateUserRequestMapping();
         RegisterUpdateUserMapping();
         // Diğer haritalama metotlarını burada çağır
+
+        TypeAdapterConfig.GlobalSettings.Scan();
     }
 
     private static void RegisterUserListMapping()
@@ -44,17 +46,15 @@ public class MappingProfile
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Surname, src => src.Surname)
             .Map(dest => dest.Email, src => src.Email)
-            .Map(dest => dest.Password, src => src.Password)
-        .Map(dest => dest.Id, src => Guid.NewGuid());
+            .Map(dest => dest.Password, src => src.Password);
     }
-
-    private static void RegisterInsertUserMapping()
-    {
-        TypeAdapterConfig<User, InsertUserCommandResult>
-            .NewConfig()
-            .Map(dest => dest.CreatedDate, src => src.CreatedDate)
-            .Map(dest => dest.Email, src => src.Email);
-    }
+    // private static void RegisterInsertUserResultMapping()
+    // {
+    //     TypeAdapterConfig<User, InsertUserCommandResult>
+    //         .NewConfig()
+    //         .Map(dest => dest.Token, src => src.JwtToken)
+    //         .Map(dest => dest.Email, src => src.Email);
+    // }
 
     private static void RegisterUpdateUserRequestMapping()
     {
