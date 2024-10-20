@@ -1,12 +1,13 @@
 using System.Data;
 using System.Reflection;
 using ExpenseTracker.Infrastructure.Abstractions;
-using ExpenseTracker.Infrastructure.Services;
 using ExpenseTracker.Infrastructure.Abstractions.Auth;
-using MySqlConnector;
+using ExpenseTracker.Infrastructure.Services;
 using ExpenseTracker.Infrastructure.Services.Auth;
+using MySqlConnector;
 
 namespace ExpenseTracker.API.Extensions;
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddProjectDependencies(this IServiceCollection services, IConfiguration configuration)
@@ -16,13 +17,24 @@ public static class ServiceCollectionExtensions
 
         // MySQL bağlantısını ekle
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new ArgumentException("The connection string 'DefaultConnection' is not configured.");
+        }
 
+        // Register IDatabaseConnection with the connection string
+        services.AddScoped<IDatabaseConnection>(sp => new DatabaseConnection(connectionString));
+
+        // Register IDbConnection
         services.AddTransient<IDbConnection>(sp => new MySqlConnection(connectionString));
 
         // Servisleri ekle
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-        //services.AddScoped(typeof(ITokenService), typeof(TokenService));
+
 
         return services;
     }
+
 }

@@ -9,12 +9,9 @@ public class UserService : BaseService<User>, IUserService
 {
     private readonly IDatabaseConnection _dbConnection;
 
-    private readonly ITokenService _tokenService;
-
-    public UserService(IDatabaseConnection dbConnection, ITokenService tokenService) : base(dbConnection, "User")
+    public UserService(IDatabaseConnection dbConnection) : base(dbConnection, "User")
     {
         this._dbConnection = dbConnection;
-        this._tokenService = tokenService;
     }
 
     public async Task<bool> RegisterAsync(User user)
@@ -57,7 +54,7 @@ public class UserService : BaseService<User>, IUserService
         }
     }
 
-    public async Task<string> LoginAsync(string email, string password)
+    public async Task<User> LoginAsync(string email, string password)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentNullException(nameof(email));
@@ -75,13 +72,7 @@ public class UserService : BaseService<User>, IUserService
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
-        string token = _tokenService.GenerateToken(user);
-        if (string.IsNullOrEmpty(token))
-        {
-            throw new UnauthorizedAccessException("Invalid email or password.");
-        }
-
-        return token;
+        return user;
     }
 
     public async Task<User> GetUserByEmailAsync(string email)
