@@ -6,6 +6,6 @@ public interface IDatabaseConnection
     Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null);
     Task<T> QuerySingleAsync<T>(string sql, object? param = null);
     Task<IEnumerable<T>> QueryMultipleAsync<T>(string sql, object? param = null);
-    Task<T> QuerySingleOrDefaultAsync<T>(string sql, object? param = null);
+    Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null);
     Task<int> ExecuteScalarAsync<T>(string sql, object? param = null);
 }

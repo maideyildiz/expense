@@ -61,13 +61,15 @@ namespace ExpenseTracker.Infrastructure.Services
             }
         }
 
-        public async Task<T> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
+        public async Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
         {
             using (var connection = CreateConnection())
             {
-                return await connection.QuerySingleOrDefaultAsync<T>(sql, param);
+                var result = await connection.QuerySingleOrDefaultAsync<T>(sql, param);
+                return result != null ? result : default;
             }
         }
+
 
         public async Task<int> ExecuteScalarAsync<T>(string sql, object? param = null)
         {

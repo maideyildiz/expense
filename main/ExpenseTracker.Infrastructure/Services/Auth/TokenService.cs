@@ -22,12 +22,13 @@ public class TokenService : ITokenService
     public TokenService(IConfiguration config, IUserService userService, ILogger<TokenService> logger)
     {
         this._config = config;
-        this._secretKey = _config["JwtSettings:SecretKey"];
-        this._issuer = _config["JwtSettings:Issuer"];
-        this._audience = _config["JwtSettings:Audience"];
+        this._secretKey = _config["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey is not set");
+        this._issuer = _config["JwtSettings:Issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer is not set");
+        this._audience = _config["JwtSettings:Audience"] ?? "defaultAudience"; // Varsayılan bir değer atanabilir
         this._userService = userService;
         this._logger = logger;
     }
+
 
     public string GenerateToken(User user)
     {
@@ -101,7 +102,7 @@ public class TokenService : ITokenService
             throw new SecurityTokenException("Invalid token claims");
         }
 
-        var user = await GetUserFromDatabase(userIdGuid);
+        var user = await _userService.GetByIdAsync(userIdGuid);
         if (user == null)
         {
             throw new SecurityTokenException("Invalid token claims");
@@ -119,10 +120,5 @@ public class TokenService : ITokenService
     public ClaimsPrincipal? GetClaimsFromToken(string token)
     {
         return ValidateToken(token);
-    }
-
-    private async Task<User> GetUserFromDatabase(Guid userId)
-    {
-        return await _userService.GetByIdAsync(userId);
     }
 }
