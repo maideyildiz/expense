@@ -1,4 +1,4 @@
-using ExpenseTracker.API.Requests.Commands;
+using ExpenseTracker.API.Requests.Commands.User;
 using ExpenseTracker.API.Requests.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +49,13 @@ namespace ExpenseTracker.API.Controllers
         {
             await _mediator.Send(request);
             return NoContent();
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginUserCommand request)
+        {
+            var user = await _mediator.Send(request);
+            return Ok(user);
         }
     }
 }

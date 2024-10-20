@@ -1,8 +1,8 @@
-using ExpenseTracker.API.Requests.Commands;
+using ExpenseTracker.API.Requests.Commands.User;
 using ExpenseTracker.Infrastructure.Abstractions;
 using MediatR;
 
-namespace ExpenseTracker.API.Handlers;
+namespace ExpenseTracker.API.Handlers.User;
 
 public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, bool>
 {

@@ -1,11 +1,10 @@
-using ExpenseTracker.API.DTOs;
-using ExpenseTracker.API.Requests.Commands;
-using ExpenseTracker.Core.Models;
+using ExpenseTracker.API.DTOs.User;
+using ExpenseTracker.API.Requests.Commands.User;
 using ExpenseTracker.Infrastructure.Abstractions;
 using Mapster;
 using MediatR;
 
-namespace ExpenseTracker.API.Handlers;
+namespace ExpenseTracker.API.Handlers.User;
 
 public class InsertUserHandler : IRequestHandler<InsertUserCommand, InsertUserCommandResult>
 {
@@ -16,7 +15,7 @@ public class InsertUserHandler : IRequestHandler<InsertUserCommand, InsertUserCo
     }
     public async Task<InsertUserCommandResult> Handle(InsertUserCommand request, CancellationToken cancellationToken)
     {
-        User user = request.Adapt<User>();
+        Core.Models.User user = request.Adapt<Core.Models.User>();
         var result = await _userService.RegisterAsync(user);
         return result.Adapt<InsertUserCommandResult>();
     }

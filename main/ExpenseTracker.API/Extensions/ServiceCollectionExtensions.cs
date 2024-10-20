@@ -2,7 +2,9 @@ using System.Data;
 using System.Reflection;
 using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Services;
+using ExpenseTracker.Infrastructure.Abstractions.Auth;
 using MySqlConnector;
+using ExpenseTracker.Infrastructure.Services.Auth;
 
 namespace ExpenseTracker.API.Extensions;
 public static class ServiceCollectionExtensions
@@ -19,6 +21,7 @@ public static class ServiceCollectionExtensions
 
         // Servisleri ekle
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+        //services.AddScoped(typeof(ITokenService), typeof(TokenService));
 
         return services;
     }

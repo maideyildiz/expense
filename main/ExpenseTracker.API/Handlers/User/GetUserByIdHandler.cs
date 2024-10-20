@@ -1,10 +1,10 @@
-using ExpenseTracker.API.DTOs;
+using ExpenseTracker.API.DTOs.User;
 using ExpenseTracker.API.Requests.Queries;
 using ExpenseTracker.Infrastructure.Abstractions;
 using Mapster;
 using MediatR;
 
-namespace ExpenseTracker.API.Handlers;
+namespace ExpenseTracker.API.Handlers.User;
 
 public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, GetUserByIdQueryResult>
 {
