@@ -4,9 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthenticationController : ControllerBase
+    [Route("auth")]
+    public class AuthenticationController : ApiController
     {
         private readonly IMediator _mediator;
 

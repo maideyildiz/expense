@@ -1,6 +1,8 @@
 
+using ErrorOr;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
+using ExpenseTracker.Core.Common.Errors;
 using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Application.Services.Authentication;
@@ -14,13 +16,13 @@ public class AuthenticationService : IAuthenticationService
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
     }
-    public async Task<AuthenticationResult> RegisterAsync(string name, string surname, string email, string password)
+    public async Task<ErrorOr<AuthenticationResult>> RegisterAsync(string name, string surname, string email, string password)
     {
         //check if user exists
         var user = await _userRepository.GetUserByEmailAsync(email);
         if (user != null)
         {
-            throw new InvalidOperationException("Email already exists.");
+            return Errors.User.DublicateEmail;
         }
         //create user
         var newUser = new User
@@ -44,16 +46,16 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public async Task<AuthenticationResult> LoginAsync(string email, string password)
+    public async Task<ErrorOr<AuthenticationResult>> LoginAsync(string email, string password)
     {
         var user = await _userRepository.GetUserByEmailAsync(email);
         if (user == null)
         {
-            throw new InvalidOperationException("User does not exists.");
+            return Errors.User.UserNotFound;
         }
         if (user.Password != password)
         {
-            throw new InvalidOperationException("Password is incorrect.");
+            return Errors.User.CredentialsError;
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Name, user.Surname);
