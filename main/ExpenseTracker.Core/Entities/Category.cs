@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Core.Models;
+namespace ExpenseTracker.Core.Entities;
 
 public class Category : Base
 {
@@ -6,5 +6,5 @@ public class Category : Base
 
     public string Description { get; set; } = string.Empty;
 
-    public IList<Expense> Expenses { get; set; }= new List<Expense>();
+    public IList<Expense> Expenses { get; set; } = new List<Expense>();
 }

@@ -1,6 +1,6 @@
 using ExpenseTracker.Core.Entities;
-namespace ExpenseTracker.Core.Repositories;
 
+namespace ExpenseTracker.Application.Common.Interfaces.Persistence;
 public interface IBaseRepository<T> where T : Base
 {
     Task<IEnumerable<T>> GetAllAsync();

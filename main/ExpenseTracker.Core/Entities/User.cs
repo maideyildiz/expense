@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Core.Models;
+namespace ExpenseTracker.Core.Entities;
 public class User : Base
 {
     public required string Email { get; set; }

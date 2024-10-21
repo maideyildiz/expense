@@ -2,14 +2,14 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Infrastructure.Abstractions;
 
-namespace ExpenseTracker.Infrastructure.Services;
+namespace ExpenseTracker.Infrastructure.Persistence;
 
-public class BaseService<T> : IBaseRepository<T> where T : Base
+public class BaseRepository<T> : IBaseRepository<T> where T : Base
 {
     protected readonly IDatabaseConnection _databaseConnection;
     protected readonly string _tableName;
 
-    public BaseService(IDatabaseConnection databaseConnection, string tableName)
+    public BaseRepository(IDatabaseConnection databaseConnection, string tableName)
     {
         _databaseConnection = databaseConnection;
         _tableName = tableName;
