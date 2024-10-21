@@ -2,6 +2,8 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 using ExpenseTracker.API.Mappings;
+using ExpenseTracker.Application;
+using ExpenseTracker.Infrastructure;
 using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Abstractions.Auth;
 using ExpenseTracker.Infrastructure.Services;
@@ -56,6 +58,7 @@ public static class ServiceCollectionExtensions
 
         MapsterConfiguration.RegisterMappings();
         // Servisleri ekle
+
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));

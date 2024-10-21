@@ -1,5 +1,6 @@
 using ExpenseTracker.API.Extensions;
-using ExpenseTracker.API.Mappings;
+using ExpenseTracker.Application;
+using ExpenseTracker.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,8 @@ builder.Services.AddCors(options =>
 });
 // Bağımlılıkları tek bir yerden yükle
 builder.Services.AddProjectDependencies(builder.Configuration);
-
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 // Swagger/OpenAPI ekle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
