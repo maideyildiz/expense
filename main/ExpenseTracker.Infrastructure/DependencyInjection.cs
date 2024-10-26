@@ -1,7 +1,6 @@
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Application.Common.Interfaces.Services;
-using ExpenseTracker.Infrastructure.Abstractions;
 using ExpenseTracker.Infrastructure.Authentication;
 using ExpenseTracker.Infrastructure.Persistence;
 using ExpenseTracker.Infrastructure.Services;
@@ -19,7 +18,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IDbRepository, DbRepository>();
-        services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         //services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }

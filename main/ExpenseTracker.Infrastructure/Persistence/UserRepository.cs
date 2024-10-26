@@ -1,16 +1,15 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.Entities;
-using ExpenseTracker.Infrastructure.Abstractions;
 
 namespace ExpenseTracker.Infrastructure.Persistence;
 
 public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    private readonly IDatabaseConnection _dbConnection;
+    protected new readonly IDbRepository _dbRepository;
 
-    public UserRepository(IDatabaseConnection dbConnection) : base(dbConnection, "User")
+    public UserRepository(IDbRepository dbRepository, string tableName) : base(dbRepository, tableName)
     {
-        _dbConnection = dbConnection;
+        _dbRepository = dbRepository;
     }
 
     public async Task AddUserAsync(User user)
@@ -25,7 +24,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentNullException(nameof(email));
 
-        var user = await _dbConnection.QueryFirstOrDefaultAsync<User>(
+        var user = await _dbRepository.QueryFirstOrDefaultAsync<User>(
             "SELECT * FROM Users WHERE Email = @Email",
             new { Email = email });
 

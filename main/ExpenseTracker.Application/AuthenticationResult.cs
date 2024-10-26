@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.Services.Authentication;
+namespace ExpenseTracker.Application;
 
 public record AuthenticationResult(
     Guid Id,
