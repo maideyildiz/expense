@@ -1,5 +1,5 @@
 using ErrorOr;
-using ExpenseTracker.API.Http;
+using ExpenseTracker.API.Common.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.API.Controllers;

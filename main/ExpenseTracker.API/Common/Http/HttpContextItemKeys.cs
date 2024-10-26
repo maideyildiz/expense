@@ -1,4 +1,4 @@
-namespace ExpenseTracker.API.Http;
+namespace ExpenseTracker.API.Common.Http;
 
 public static class HttpContextItemKeys
 {

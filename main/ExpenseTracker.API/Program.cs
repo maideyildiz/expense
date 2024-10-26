@@ -1,6 +1,4 @@
 using ExpenseTracker.API.Common.Errors;
-using ExpenseTracker.API.Extensions;
-using ExpenseTracker.API.Middleware;
 using ExpenseTracker.Application;
 using ExpenseTracker.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,7 +15,7 @@ builder.Services.AddCors(options =>
     });
 });
 // Bağımlılıkları tek bir yerden yükle
-builder.Services.AddProjectDependencies(builder.Configuration);
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 // Swagger/OpenAPI ekle

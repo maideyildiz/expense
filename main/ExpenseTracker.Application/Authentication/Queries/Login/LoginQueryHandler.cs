@@ -3,6 +3,7 @@ using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using MediatR;
 using ExpenseTracker.Core.Common.Errors;
+using ExpenseTracker.Application.Authentication.Common;
 
 namespace ExpenseTracker.Application.Authentication.Queries.Login;
 
@@ -32,10 +33,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
         var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Name, user.Surname);
 
         return new AuthenticationResult(
-            user.Id,
-            user.Name,
-            user.Surname,
-            user.Email,
+            user,
             token);
     }
 }

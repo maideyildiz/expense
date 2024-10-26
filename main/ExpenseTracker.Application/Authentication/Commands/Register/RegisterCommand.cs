@@ -1,4 +1,5 @@
 using ErrorOr;
+using ExpenseTracker.Application.Authentication.Common;
 using MediatR;
 
 namespace ExpenseTracker.Application.Authentication.Commands.Register;

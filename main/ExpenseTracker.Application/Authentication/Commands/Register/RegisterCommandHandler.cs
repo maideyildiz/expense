@@ -4,6 +4,7 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Core.Common.Errors;
 using MediatR;
+using ExpenseTracker.Application.Authentication.Common;
 
 namespace ExpenseTracker.Application.Authentication.Commands.Register;
 
@@ -41,10 +42,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
         //return token
         var token = _jwtTokenGenerator.GenerateToken(newUser.Id, newUser.Name, newUser.Surname);
         return new AuthenticationResult(
-            newUser.Id,
-            newUser.Name,
-            newUser.Surname,
-            newUser.Email,
+            newUser,
             token);
     }
 }
