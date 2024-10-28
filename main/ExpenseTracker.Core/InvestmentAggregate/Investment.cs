@@ -1,8 +1,8 @@
 using ExpenseTracker.Core.Common.Models;
 using ExpenseTracker.Core.Common.ValueObjests;
-using ExpenseTracker.Core.InvestmentAggregateRoot.ValueObjects;
+using ExpenseTracker.Core.InvestmentAggregate.ValueObjects;
 
-namespace ExpenseTracker.Core.InvestmentAggregateRoot;
+namespace ExpenseTracker.Core.InvestmentAggregate;
 
 public class Investment : AggregateRoot<InvestmentId>
 {

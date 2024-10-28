@@ -1,6 +1,6 @@
 using ExpenseTracker.Core.Common.Models;
 
-namespace ExpenseTracker.Core.ExpenseAggregateRoot.ValueObjests;
+namespace ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
 
 public sealed class ExpenseId : ValueObject
 {

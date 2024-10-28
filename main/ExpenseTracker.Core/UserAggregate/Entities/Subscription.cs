@@ -1,7 +1,7 @@
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.UserAggregateRoot.ValueObjects;
+using ExpenseTracker.Core.UserAggregate.ValueObjects;
 
-namespace ExpenseTracker.Core.UserAggregateRoot.Entities;
+namespace ExpenseTracker.Core.UserAggregate.Entities;
 
 public sealed class Subscription : Entity<SubscriptionId>
 {

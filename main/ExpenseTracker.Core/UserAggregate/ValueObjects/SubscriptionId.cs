@@ -1,15 +1,15 @@
 using ExpenseTracker.Core.Common.Models;
 
-namespace ExpenseTracker.Core.UserAggregateRoot.ValueObjects;
+namespace ExpenseTracker.Core.UserAggregate.ValueObjects;
 
-public sealed class UserId : ValueObject
+public sealed class SubscriptionId : ValueObject
 {
     public Guid Value { get; }
-    private UserId(Guid value)
+    private SubscriptionId(Guid value)
     {
         Value = value;
     }
-    public static UserId CreateUnique()
+    public static SubscriptionId CreateUnique()
     {
         return new(Guid.NewGuid());
     }

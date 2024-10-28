@@ -1,10 +1,10 @@
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.ExpenseAggregateRoot.ValueObjests;
-using ExpenseTracker.Core.InvestmentAggregateRoot.ValueObjects;
-using ExpenseTracker.Core.UserAggregateRoot.Entities;
-using ExpenseTracker.Core.UserAggregateRoot.ValueObjects;
+using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
+using ExpenseTracker.Core.InvestmentAggregate.ValueObjects;
+using ExpenseTracker.Core.UserAggregate.Entities;
+using ExpenseTracker.Core.UserAggregate.ValueObjects;
 
-namespace ExpenseTracker.Core.UserAggregateRoot;
+namespace ExpenseTracker.Core.UserAggregate;
 
 public class User : AggregateRoot<UserId>
 {
