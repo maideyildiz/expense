@@ -11,9 +11,9 @@ public sealed class Subscription : Entity<SubscriptionId>
 
     public Subscription(SubscriptionId id, string name, string description, decimal monthlyCost) : base(id)
     {
-        Name = name;
-        Description = description;
-        MonthlyCost = monthlyCost;
+        this.Name = name;
+        this.Description = description;
+        this.MonthlyCost = monthlyCost;
     }
 
     public static Subscription Create(string name, string description, decimal monthlyCost)

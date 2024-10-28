@@ -5,11 +5,11 @@ namespace ExpenseTracker.Infrastructure.Persistence;
 
 public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    protected new readonly IDbRepository _dbRepository;
+    protected new readonly IDbRepository dbRepository;
 
     public UserRepository(IDbRepository dbRepository, string tableName) : base(dbRepository, tableName)
     {
-        _dbRepository = dbRepository;
+        this.dbRepository = dbRepository;
     }
 
     // public async Task AddUserAsync(User user)
@@ -24,7 +24,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentNullException(nameof(email));
 
-        var user = await _dbRepository.QueryFirstOrDefaultAsync<User>(
+        var user = await this.dbRepository.QueryFirstOrDefaultAsync<User>(
             "SELECT * FROM Users WHERE Email = @Email",
             new { Email = email });
 

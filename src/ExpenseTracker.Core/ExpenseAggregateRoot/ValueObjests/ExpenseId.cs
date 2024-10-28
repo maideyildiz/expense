@@ -7,7 +7,7 @@ public sealed class ExpenseId : ValueObject
     public Guid Value { get; }
     private ExpenseId(Guid value)
     {
-        Value = value;
+        this.Value = value;
     }
     public static ExpenseId CreateUnique()
     {
@@ -16,6 +16,6 @@ public sealed class ExpenseId : ValueObject
 
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Value;
+        yield return this.Value;
     }
 }

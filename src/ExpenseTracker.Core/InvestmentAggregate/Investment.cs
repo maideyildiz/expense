@@ -13,11 +13,11 @@ public class Investment : AggregateRoot<InvestmentId>
     public Category Category { get; }
     private Investment(InvestmentId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category) : base(id)
     {
-        Amount = amount;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-        Description = description;
-        Category = category;
+        this.Amount = amount;
+        this.CreatedAt = createdAt;
+        this.UpdatedAt = updatedAt;
+        this.Description = description;
+        this.Category = category;
     }
 
     public static Investment Create(InvestmentId id,

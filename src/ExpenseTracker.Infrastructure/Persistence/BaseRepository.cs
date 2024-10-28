@@ -4,25 +4,25 @@ namespace ExpenseTracker.Infrastructure.Persistence;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {
-    protected readonly IDbRepository _dbRepository;
-    protected readonly string _tableName;
+    protected readonly IDbRepository dbRepository;
+    protected readonly string tableName;
 
     public BaseRepository(IDbRepository dbRepository, string tableName)
     {
-        _dbRepository = dbRepository;
-        _tableName = tableName;
+        this.dbRepository = dbRepository;
+        this.tableName = tableName;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
         string sql = "SELECT * FROM " + typeof(T).Name + "s";
-        return await _dbRepository.QueryAsync<T>(sql);
+        return await this.dbRepository.QueryAsync<T>(sql);
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
         string sql = "SELECT * FROM " + typeof(T).Name + "s WHERE Id = @Id";
-        return await _dbRepository.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
+        return await this.dbRepository.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
     }
 
     // public async Task<int> AddAsync(T obj)
@@ -43,6 +43,6 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     public async Task<int> DeleteAsync(Guid id)
     {
         string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";
-        return await _dbRepository.ExecuteAsync(sql, new { Id = id });
+        return await this.dbRepository.ExecuteAsync(sql, new { Id = id });
     }
 }

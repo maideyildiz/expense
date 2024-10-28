@@ -11,15 +11,15 @@ namespace ExpenseTracker.API.Common.Errors;
 
 public sealed class ExpenseTrackerProblemDetailsFactory : ProblemDetailsFactory
 {
-    private readonly ApiBehaviorOptions _options;
-    private readonly Action<ProblemDetailsContext>? _configure;
+    private readonly ApiBehaviorOptions options;
+    private readonly Action<ProblemDetailsContext>? configure;
 
     public ExpenseTrackerProblemDetailsFactory(
         IOptions<ApiBehaviorOptions> options,
         IOptions<ProblemDetailsOptions>? problemDetailsOptions = null)
     {
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-        _configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
+        this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        this.configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
     }
 
     public override ProblemDetails CreateProblemDetails(
@@ -41,7 +41,7 @@ public sealed class ExpenseTrackerProblemDetailsFactory : ProblemDetailsFactory
             Instance = instance,
         };
 
-        ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
+        this.ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
 
         return problemDetails;
     }
@@ -72,7 +72,7 @@ public sealed class ExpenseTrackerProblemDetailsFactory : ProblemDetailsFactory
             problemDetails.Title = title;
         }
 
-        ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
+        this.ApplyProblemDetailsDefaults(httpContext, problemDetails, statusCode.Value);
 
         return problemDetails;
     }
@@ -81,7 +81,7 @@ public sealed class ExpenseTrackerProblemDetailsFactory : ProblemDetailsFactory
     {
         problemDetails.Status ??= statusCode;
 
-        if (_options.ClientErrorMapping.TryGetValue(statusCode, out var clientErrorData))
+        if (this.options.ClientErrorMapping.TryGetValue(statusCode, out var clientErrorData))
         {
             problemDetails.Title ??= clientErrorData.Title;
             problemDetails.Type ??= clientErrorData.Link;
@@ -99,6 +99,6 @@ public sealed class ExpenseTrackerProblemDetailsFactory : ProblemDetailsFactory
             problemDetails.Extensions.Add("errorCodes", errors.Select(error => error.Code));
         }
 
-        _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
+        this.configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }
 }

@@ -11,7 +11,7 @@ public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)
     {
-        HttpContext.Items[HttpContextItemKeys.Errors] = errors;
-        return Problem();
+        this.HttpContext.Items[HttpContextItemKeys.Errors] = errors;
+        return this.Problem();
     }
 }

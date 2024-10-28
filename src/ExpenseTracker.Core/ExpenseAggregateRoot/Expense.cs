@@ -14,11 +14,11 @@ public class Expense : AggregateRoot<ExpenseId>
 
     private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category) : base(id)
     {
-        Amount = amount;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-        Description = description;
-        Category = category;
+        this.Amount = amount;
+        this.CreatedAt = createdAt;
+        this.UpdatedAt = updatedAt;
+        this.Description = description;
+        this.Category = category;
     }
 
     public static Expense Create(ExpenseId id,

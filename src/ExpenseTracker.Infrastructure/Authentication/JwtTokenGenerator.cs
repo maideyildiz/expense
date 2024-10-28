@@ -10,16 +10,16 @@ namespace ExpenseTracker.Infrastructure.Authentication;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly JwtSettings _jwtSettings;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly JwtSettings jwtSettings;
+    private readonly IDateTimeProvider dateTimeProvider;
     public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettings> jwtOptions)
     {
-        _jwtSettings = jwtOptions.Value;
-        _dateTimeProvider = dateTimeProvider;
+        this.jwtSettings = jwtOptions.Value;
+        this.dateTimeProvider = dateTimeProvider;
     }
     public string GenerateToken(Guid id, string name, string surname)
     {
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+        var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
 
         var claims = new[]
         {
@@ -32,10 +32,10 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         var tokenDescriptor = new JwtSecurityToken
         (
-            issuer: _jwtSettings.Issuer,
-            expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
+            issuer: this.jwtSettings.Issuer,
+            expires: this.dateTimeProvider.UtcNow.AddMinutes(this.jwtSettings.ExpiryInMinutes),
             claims: claims,
-            audience: _jwtSettings.Audience,
+            audience: this.jwtSettings.Audience,
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         );
 
