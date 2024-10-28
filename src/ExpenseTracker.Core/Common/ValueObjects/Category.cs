@@ -8,7 +8,7 @@ public sealed class Category : ValueObject
 
     private Category(string name)
     {
-        Name = name;
+        this.Name = name;
     }
 
     public static Category Create(string name)
@@ -18,6 +18,6 @@ public sealed class Category : ValueObject
 
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Name;
+        yield return this.Name;
     }
 }

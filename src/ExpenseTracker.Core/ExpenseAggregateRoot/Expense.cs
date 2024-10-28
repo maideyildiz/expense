@@ -1,9 +1,7 @@
+namespace ExpenseTracker.Core.ExpenseAggregate;
 using ExpenseTracker.Core.Common.Models;
 using ExpenseTracker.Core.Common.ValueObjests;
 using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
-
-namespace ExpenseTracker.Core.ExpenseAggregate;
-
 public class Expense : AggregateRoot<ExpenseId>
 {
     public decimal Amount { get; }
@@ -12,21 +10,23 @@ public class Expense : AggregateRoot<ExpenseId>
     public string Description { get; }
     public Category Category { get; }
 
-    private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category) : base(id)
+    private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category)
+        : base(id)
     {
-        Amount = amount;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-        Description = description;
-        Category = category;
+        this.Amount = amount;
+        this.CreatedAt = createdAt;
+        this.UpdatedAt = updatedAt;
+        this.Description = description;
+        this.Category = category;
     }
 
-    public static Expense Create(ExpenseId id,
-                                 decimal amount,
-                                 DateTime createdAt,
-                                 DateTime updatedAt,
-                                 string description,
-                                 Category category)
+    public static Expense Create(
+        ExpenseId id,
+        decimal amount,
+        DateTime createdAt,
+        DateTime updatedAt,
+        string description,
+        Category category)
     {
         return new(id, amount, createdAt, updatedAt, description, category);
     }

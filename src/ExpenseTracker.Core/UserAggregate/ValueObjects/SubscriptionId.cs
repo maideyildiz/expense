@@ -7,7 +7,7 @@ public sealed class SubscriptionId : ValueObject
     public Guid Value { get; }
     private SubscriptionId(Guid value)
     {
-        Value = value;
+        this.Value = value;
     }
     public static SubscriptionId CreateUnique()
     {
@@ -16,6 +16,6 @@ public sealed class SubscriptionId : ValueObject
 
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Value;
+        yield return this.Value;
     }
 }

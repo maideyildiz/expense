@@ -1,12 +1,13 @@
-using ErrorOr;
-using ExpenseTracker.Application.Common.Interfaces.Authentication;
-using ExpenseTracker.Application.Common.Interfaces.Persistence;
-using ExpenseTracker.Core.Entities;
-using ExpenseTracker.Core.Common.Errors;
-using MediatR;
-using ExpenseTracker.Application.Authentication.Common;
 
 namespace ExpenseTracker.Application.Authentication.Commands.Register;
+using ErrorOr;
+using MediatR;
+using ExpenseTracker.Application.Authentication.Common;
+using ExpenseTracker.Application.Common.Interfaces.Authentication;
+using ExpenseTracker.Application.Common.Interfaces.Persistence;
+using ExpenseTracker.Core.Common.Errors;
+using ExpenseTracker.Core.UserAggregate;
+using ExpenseTracker.Core.UserAggregate.Entities;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {
@@ -15,34 +16,46 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
 
     public RegisterCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
-        _jwtTokenGenerator = jwtTokenGenerator;
-        _userRepository = userRepository;
+        this._jwtTokenGenerator = jwtTokenGenerator;
+        this._userRepository = userRepository;
     }
 
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetUserByEmailAsync(command.Email);
-        if (user != null)
-        {
-            return Errors.User.DublicateEmail;
-        }
+        var user = await this._userRepository.GetUserByEmailAsync(command.Email);
+        if (user is not null)
+            return Errors.Authentication.InvalidCredentials;
+
+
+        Subscription subs = Subscription.Create("Free", "Free", decimal.One);
         //create user
-        var newUser = new User
-        {
-            Name = command.Name,
-            Surname = command.Surname,
-            Email = command.Email,
-            Password = command.Password
-        };
+        var newUser = User.Create(
+            command.FirstName,
+            command.LastName,
+            command.Email,
+            command.Password,
+            0,
+            0,
+            DateTime.Now,
+            DateTime.Now,
+            DateTime.Now,
+            true,
+            subs);
 
-        await _userRepository.AddUserAsync(newUser);
+
+        var result = await this._userRepository.AddAsync(newUser);
+
+        if (result is 0)
+            return Errors.Authentication.InvalidCredentials;
+
+
         //create token
-
-        //return token
-        var token = _jwtTokenGenerator.GenerateToken(newUser.Id, newUser.Name, newUser.Surname);
+        var token = this._jwtTokenGenerator.GenerateToken(newUser.Id.Value, newUser.FirstName, newUser.LastName, newUser.Subscription.Name);
         return new AuthenticationResult(
-            newUser,
+            user,
             token);
+
+
     }
 }

@@ -1,8 +1,8 @@
 namespace ExpenseTracker.Contracts.Authentication;
-public record AuthenticationResponse
-(
-    string Token,
+public record AuthenticationResponse(
+    Guid Id,
+    string FirstName,
+    string LastName,
     string Email,
-    string Name,
-    string Surname
+    string Token
 );

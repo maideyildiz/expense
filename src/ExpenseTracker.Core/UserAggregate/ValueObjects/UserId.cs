@@ -7,7 +7,7 @@ public sealed class UserId : ValueObject
     public Guid Value { get; }
     private UserId(Guid value)
     {
-        Value = value;
+        this.Value = value;
     }
     public static UserId CreateUnique()
     {
@@ -16,6 +16,6 @@ public sealed class UserId : ValueObject
 
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Value;
+        yield return this.Value;
     }
 }

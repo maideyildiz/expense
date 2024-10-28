@@ -7,7 +7,7 @@ public sealed class InvestmentId : ValueObject
     public Guid Value { get; }
     private InvestmentId(Guid value)
     {
-        Value = value;
+        this.Value = value;
     }
     public static InvestmentId CreateUnique()
     {
@@ -16,6 +16,6 @@ public sealed class InvestmentId : ValueObject
 
     public override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Value;
+        yield return this.Value;
     }
 }

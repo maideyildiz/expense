@@ -1,4 +1,6 @@
-using ExpenseTracker.Core.Entities;
+
+
+using ExpenseTracker.Core.UserAggregate;
 
 namespace ExpenseTracker.Application.Authentication.Common;
 
