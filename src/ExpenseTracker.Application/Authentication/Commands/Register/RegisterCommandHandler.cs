@@ -32,8 +32,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
         Subscription subs = Subscription.Create("Free", "Free", decimal.One);
         //create user
         var newUser = User.Create(
-            command.Name,
-            command.Surname,
+            command.FirstName,
+            command.LastName,
             command.Email,
             command.Password,
             0,
