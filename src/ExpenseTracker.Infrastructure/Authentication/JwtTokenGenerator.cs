@@ -27,17 +27,15 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.GivenName, name),
             new Claim(JwtRegisteredClaimNames.FamilyName, surname),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, subscriptionName) // Add user roles if necessary
+            new Claim(ClaimTypes.Role, subscriptionName), // Add user roles if necessary
         };
 
-        var tokenDescriptor = new JwtSecurityToken
-        (
+        var tokenDescriptor = new JwtSecurityToken(
             issuer: this.jwtSettings.Issuer,
             expires: this.dateTimeProvider.UtcNow.AddMinutes(this.jwtSettings.ExpiryInMinutes),
             claims: claims,
             audience: this.jwtSettings.Audience,
-            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        );
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature));
 
         return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
     }
