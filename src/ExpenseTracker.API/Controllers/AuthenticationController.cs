@@ -1,31 +1,52 @@
-namespace ExpenseTracker.API.Controllers
+namespace ExpenseTracker.API.Controllers;
+using ErrorOr;
+using MapsterMapper;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ExpenseTracker.Application.Authentication.Commands.Register;
+using ExpenseTracker.Contracts.Authentication;
+using ExpenseTracker.Application.Authentication.Queries.Login;
+using ExpenseTracker.Application.Authentication.Common;
+using ExpenseTracker.Core.Common.Errors;
+
+[Route("auth")]
+[AllowAnonymous]
+public class AuthenticationController : ApiController
 {
-    using ExpenseTracker.Contracts.Authentication;
-    using MediatR;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
+    private readonly ISender mediator;
+    private readonly IMapper _mapper;
 
-    [Route("auth")]
-    [AllowAnonymous]
-    public class AuthenticationController : ApiController
+    public AuthenticationController(ISender mediator, IMapper mapper)
     {
-        private readonly IMediator mediator;
+        this.mediator = mediator;
+        this._mapper = mapper;
+    }
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        var command = this._mapper.Map<RegisterCommand>(request);
+        ErrorOr<AuthenticationResult> authResult = (ErrorOr<AuthenticationResult>)await mediator.Send(request);
 
-        public AuthenticationController(IMediator mediator)
+        return authResult.Match(
+            authResult => Ok(this._mapper.Map<AuthenticationResult>(authResult)),
+            errors => Problem(errors));
+    }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var query = this._mapper.Map<LoginQuery>(request);
+        ErrorOr<AuthenticationResult> authResult = (ErrorOr<AuthenticationResult>)await mediator.Send(request);
+        if (authResult.IsError && authResult.FirstError == Errors.Authentication.InvalidCredentials)
         {
-            this.mediator = mediator;
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                title: authResult.FirstError.Description);
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            var token = await this.mediator.Send(request);
-            return this.Ok(token);
-        }
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            var user = await this.mediator.Send(request);
-            return this.Ok(user);
-        }
+
+        return authResult.Match(
+            authResult => Ok(this._mapper.Map<AuthenticationResult>(authResult)),
+            errors => Problem(errors));
     }
 }
+
