@@ -9,28 +9,24 @@ using ExpenseTracker.Core.Common.Errors;
 using ExpenseTracker.Application.Authentication.Common;
 public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
 {
-    private readonly IJwtTokenGenerator jwtTokenGenerator;
-    private readonly IUserRepository userRepository;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUserRepository _userRepository;
 
     public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
-        this.jwtTokenGenerator = jwtTokenGenerator;
-        this.userRepository = userRepository;
+        this._jwtTokenGenerator = jwtTokenGenerator;
+        this._userRepository = userRepository;
     }
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUserByEmailAsync(query.Email);
-        if (user == null)
+        var user = await this._userRepository.GetUserByEmailAsync(query.Email);
+        if (user is null || user.PasswordHash != query.Password || !user.IsActive)
         {
             return Errors.Authentication.InvalidCredentials;
         }
-        if (user.PasswordHash != query.Password)
-        {
-            return Errors.Authentication.InvalidCredentials; ;
-        }
 
-        var token = jwtTokenGenerator.GenerateToken(new Guid(), user.FirstName, user.LastName);
+        var token = this._jwtTokenGenerator.GenerateToken(user.Id.Value, user.FirstName, user.LastName, user.Subscription.Name);
 
         return new AuthenticationResult(
             user,

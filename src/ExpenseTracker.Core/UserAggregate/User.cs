@@ -24,18 +24,20 @@ public class User : AggregateRoot<UserId>
     public IReadOnlyList<ExpenseId> ExpenseIds => this.expenseIds.AsReadOnly();
     public IReadOnlyList<InvestmentId> InvestmentIds => this.investmentIds.AsReadOnly();
 
-    private User(UserId id,
-                string firstName,
-                string lastName,
-                string email,
-                string passwordHash,
-                decimal mothlySalary,
-                decimal yearlySalary,
-                DateTime createdAt,
-                DateTime updatedAt,
-                DateTime lastLoginAt,
-                bool isActive,
-                Subscription subscription) : base(id)
+    private User(
+        UserId id,
+        string firstName,
+        string lastName,
+        string email,
+        string passwordHash,
+        decimal mothlySalary,
+        decimal yearlySalary,
+        DateTime createdAt,
+        DateTime updatedAt,
+        DateTime lastLoginAt,
+        bool isActive,
+        Subscription subscription)
+        : base(id)
     {
         this.FirstName = firstName;
         this.LastName = lastName;
@@ -50,17 +52,18 @@ public class User : AggregateRoot<UserId>
         this.Subscription = subscription;
     }
 
-    public static User Create(string firstName,
-                             string lastName,
-                             string email,
-                             string passwordHash,
-                             decimal mothlySalary,
-                             decimal yearlySalary,
-                             DateTime createdAt,
-                             DateTime updatedAt,
-                             DateTime lastLoginAt,
-                             bool isActive,
-                             Subscription subscription)
+    public static User Create(
+        string firstName,
+        string lastName,
+        string email,
+        string passwordHash,
+        decimal mothlySalary,
+        decimal yearlySalary,
+        DateTime createdAt,
+        DateTime updatedAt,
+        DateTime lastLoginAt,
+        bool isActive,
+        Subscription subscription)
     {
         return new(UserId.CreateUnique(),
                     firstName,

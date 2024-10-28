@@ -10,7 +10,8 @@ public class Expense : AggregateRoot<ExpenseId>
     public string Description { get; }
     public Category Category { get; }
 
-    private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category) : base(id)
+    private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category)
+        : base(id)
     {
         this.Amount = amount;
         this.CreatedAt = createdAt;
@@ -19,12 +20,13 @@ public class Expense : AggregateRoot<ExpenseId>
         this.Category = category;
     }
 
-    public static Expense Create(ExpenseId id,
-                                 decimal amount,
-                                 DateTime createdAt,
-                                 DateTime updatedAt,
-                                 string description,
-                                 Category category)
+    public static Expense Create(
+        ExpenseId id,
+        decimal amount,
+        DateTime createdAt,
+        DateTime updatedAt,
+        string description,
+        Category category)
     {
         return new(id, amount, createdAt, updatedAt, description, category);
     }
