@@ -7,24 +7,27 @@ namespace ExpenseTracker.Core.ExpenseAggregateRoot;
 public class Expense : AggregateRoot<ExpenseId>
 {
     public decimal Amount { get; }
-    public DateTime Date { get; }
+    public DateTime CreatedAt { get; }
+    public DateTime UpdatedAt { get; }
     public string Description { get; }
     public Category Category { get; }
 
-    private Expense(ExpenseId id, decimal amount, DateTime date, string description, Category category) : base(id)
+    private Expense(ExpenseId id, decimal amount, DateTime createdAt, DateTime updatedAt, string description, Category category) : base(id)
     {
         Amount = amount;
-        Date = date;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
         Description = description;
         Category = category;
     }
 
     public static Expense Create(ExpenseId id,
                                  decimal amount,
-                                 DateTime date,
+                                 DateTime createdAt,
+                                 DateTime updatedAt,
                                  string description,
                                  Category category)
     {
-        return new(id, amount, date, description, category);
+        return new(id, amount, createdAt, updatedAt, description, category);
     }
 }
