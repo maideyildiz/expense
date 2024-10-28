@@ -25,12 +25,12 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
         {
             return Errors.Authentication.InvalidCredentials;
         }
-        if (user.Password != query.Password)
+        if (user.PasswordHash != query.Password)
         {
             return Errors.Authentication.InvalidCredentials; ;
         }
 
-        var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Name, user.Surname);
+        var token = _jwtTokenGenerator.GenerateToken(new Guid(), user.FirstName, user.LastName);
 
         return new AuthenticationResult(
             user,

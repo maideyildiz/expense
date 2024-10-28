@@ -1,5 +1,5 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
-using ExpenseTracker.Core.Entities;
+using ExpenseTracker.Core.UserAggregate;
 
 namespace ExpenseTracker.Infrastructure.Persistence;
 
@@ -12,12 +12,12 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         _dbRepository = dbRepository;
     }
 
-    public async Task AddUserAsync(User user)
-    {
-        //hash password
-        await AddAsync(user);
-        throw new NotImplementedException();
-    }
+    // public async Task AddUserAsync(User user)
+    // {
+    //     //hash password
+    //     await AddAsync(user);
+    //     throw new NotImplementedException();
+    // }
 
     public async Task<User?> GetUserByEmailAsync(string email)
     {
