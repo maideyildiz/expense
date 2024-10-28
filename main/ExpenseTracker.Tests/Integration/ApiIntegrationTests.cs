@@ -1,1 +1,0 @@
-namespace ExpenseTracker.Tests.Integration;
