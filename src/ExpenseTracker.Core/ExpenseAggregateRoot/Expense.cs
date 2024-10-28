@@ -1,9 +1,7 @@
+namespace ExpenseTracker.Core.ExpenseAggregate;
 using ExpenseTracker.Core.Common.Models;
 using ExpenseTracker.Core.Common.ValueObjests;
 using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
-
-namespace ExpenseTracker.Core.ExpenseAggregate;
-
 public class Expense : AggregateRoot<ExpenseId>
 {
     public decimal Amount { get; }

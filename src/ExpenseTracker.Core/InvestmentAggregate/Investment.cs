@@ -1,9 +1,7 @@
+namespace ExpenseTracker.Core.InvestmentAggregate;
 using ExpenseTracker.Core.Common.Models;
 using ExpenseTracker.Core.Common.ValueObjests;
 using ExpenseTracker.Core.InvestmentAggregate.ValueObjects;
-
-namespace ExpenseTracker.Core.InvestmentAggregate;
-
 public class Investment : AggregateRoot<InvestmentId>
 {
     public decimal Amount { get; }
@@ -20,12 +18,13 @@ public class Investment : AggregateRoot<InvestmentId>
         this.Category = category;
     }
 
-    public static Investment Create(InvestmentId id,
-                                    decimal amount,
-                                    DateTime createdAt,
-                                    DateTime updatedAt,
-                                    string description,
-                                    Category category)
+    public static Investment Create(
+        InvestmentId id,
+        decimal amount,
+        DateTime createdAt,
+        DateTime updatedAt,
+        string description,
+        Category category)
     {
         return new(id, amount, createdAt, updatedAt, description, category);
     }
