@@ -1,29 +1,28 @@
+
+namespace ExpenseTracker.Application.Authentication.Commands.Register;
 using ErrorOr;
+using MediatR;
+using ExpenseTracker.Application.Authentication.Common;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.Common.Errors;
-using MediatR;
-using ExpenseTracker.Application.Authentication.Common;
-using ExpenseTracker.Core.UserAggregate;
-using ExpenseTracker.Core.UserAggregate.Entities;
 
-namespace ExpenseTracker.Application.Authentication.Commands.Register;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IUserRepository _userRepository;
+    private readonly IJwtTokenGenerator jwtTokenGenerator;
+    private readonly IUserRepository userRepository;
 
     public RegisterCommandHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
-        _jwtTokenGenerator = jwtTokenGenerator;
-        _userRepository = userRepository;
+        this.jwtTokenGenerator = jwtTokenGenerator;
+        this.userRepository = userRepository;
     }
 
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetUserByEmailAsync(command.Email);
+        var user = await userRepository.GetUserByEmailAsync(command.Email);
         if (user != null)
         {
             return Errors.User.DublicateEmail;
