@@ -8,8 +8,8 @@ namespace ExpenseTracker.Core.UserAggregate;
 
 public class User : AggregateRoot<UserId>
 {
-    private readonly List<ExpenseId> _expenseIds = new();
-    private readonly List<InvestmentId> _investmentIds = new();
+    private readonly List<ExpenseId> expenseIds = new();
+    private readonly List<InvestmentId> investmentIds = new();
     public string FirstName { get; }
     public string LastName { get; }
     public string Email { get; }
@@ -21,46 +21,49 @@ public class User : AggregateRoot<UserId>
     public DateTime LastLoginAt { get; }
     public bool IsActive { get; }
     public Subscription Subscription { get; }
-    public IReadOnlyList<ExpenseId> ExpenseIds => _expenseIds.AsReadOnly();
-    public IReadOnlyList<InvestmentId> InvestmentIds => _investmentIds.AsReadOnly();
+    public IReadOnlyList<ExpenseId> ExpenseIds => this.expenseIds.AsReadOnly();
+    public IReadOnlyList<InvestmentId> InvestmentIds => this.investmentIds.AsReadOnly();
 
-    private User(UserId id,
-                string firstName,
-                string lastName,
-                string email,
-                string passwordHash,
-                decimal mothlySalary,
-                decimal yearlySalary,
-                DateTime createdAt,
-                DateTime updatedAt,
-                DateTime lastLoginAt,
-                bool isActive,
-                Subscription subscription) : base(id)
+    private User(
+        UserId id,
+        string firstName,
+        string lastName,
+        string email,
+        string passwordHash,
+        decimal mothlySalary,
+        decimal yearlySalary,
+        DateTime createdAt,
+        DateTime updatedAt,
+        DateTime lastLoginAt,
+        bool isActive,
+        Subscription subscription)
+        : base(id)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
-        PasswordHash = passwordHash;
-        MothlySalary = mothlySalary;
-        YearlySalary = yearlySalary;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
-        LastLoginAt = lastLoginAt;
-        IsActive = isActive;
-        Subscription = subscription;
+        this.FirstName = firstName;
+        this.LastName = lastName;
+        this.Email = email;
+        this.PasswordHash = passwordHash;
+        this.MothlySalary = mothlySalary;
+        this.YearlySalary = yearlySalary;
+        this.CreatedAt = createdAt;
+        this.UpdatedAt = updatedAt;
+        this.LastLoginAt = lastLoginAt;
+        this.IsActive = isActive;
+        this.Subscription = subscription;
     }
 
-    public static User Create(string firstName,
-                             string lastName,
-                             string email,
-                             string passwordHash,
-                             decimal mothlySalary,
-                             decimal yearlySalary,
-                             DateTime createdAt,
-                             DateTime updatedAt,
-                             DateTime lastLoginAt,
-                             bool isActive,
-                             Subscription subscription)
+    public static User Create(
+        string firstName,
+        string lastName,
+        string email,
+        string passwordHash,
+        decimal mothlySalary,
+        decimal yearlySalary,
+        DateTime createdAt,
+        DateTime updatedAt,
+        DateTime lastLoginAt,
+        bool isActive,
+        Subscription subscription)
     {
         return new(UserId.CreateUnique(),
                     firstName,

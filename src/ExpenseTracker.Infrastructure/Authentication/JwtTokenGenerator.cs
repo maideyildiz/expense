@@ -1,25 +1,25 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ExpenseTracker.Application.Common.Interfaces.Authentication;
-using ExpenseTracker.Application.Common.Interfaces.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ExpenseTracker.Application.Common.Interfaces.Authentication;
+using ExpenseTracker.Application.Common.Interfaces.Services;
 
 namespace ExpenseTracker.Infrastructure.Authentication;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly JwtSettings _jwtSettings;
-    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly JwtSettings jwtSettings;
+    private readonly IDateTimeProvider dateTimeProvider;
     public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettings> jwtOptions)
     {
-        _jwtSettings = jwtOptions.Value;
-        _dateTimeProvider = dateTimeProvider;
+        this.jwtSettings = jwtOptions.Value;
+        this.dateTimeProvider = dateTimeProvider;
     }
-    public string GenerateToken(Guid id, string name, string surname)
+    public string GenerateToken(Guid id, string name, string surname, string subscriptionName)
     {
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+        var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
 
         var claims = new[]
         {
@@ -27,18 +27,47 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.GivenName, name),
             new Claim(JwtRegisteredClaimNames.FamilyName, surname),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //new Claim(ClaimTypes.Role, user.Role) // Add user roles if necessary
+            new Claim(ClaimTypes.Role, subscriptionName), // Add user roles if necessary
         };
 
-        var tokenDescriptor = new JwtSecurityToken
-        (
-            issuer: _jwtSettings.Issuer,
-            expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
+        var tokenDescriptor = new JwtSecurityToken(
+            issuer: this.jwtSettings.Issuer,
+            expires: this.dateTimeProvider.UtcNow.AddMinutes(this.jwtSettings.ExpiryInMinutes),
             claims: claims,
-            audience: _jwtSettings.Audience,
-            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        );
+            audience: this.jwtSettings.Audience,
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature));
 
         return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+    }
+
+    public string RevokeToken(string token)
+    {
+        return this.GenerateToken(Guid.Parse(token), string.Empty, string.Empty, string.Empty);
+    }
+
+    public ClaimsPrincipal? ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
+
+        try
+        {
+            var claimsPrincipal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = this.jwtSettings.Issuer,
+                ValidateAudience = true,
+                ValidAudience = this.jwtSettings.Audience,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            return claimsPrincipal;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
