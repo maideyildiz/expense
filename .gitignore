@@ -377,6 +377,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # VS Code files for those working on multiple tools
+.vscode
+.vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -393,6 +395,14 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+*.env
+*.sql
 
 # JetBrains Rider
 *.sln.iml
+
+
+# Credentials
+ExpenseTracker.Infrastructure/keys/
+.config/
+appsettings.json
