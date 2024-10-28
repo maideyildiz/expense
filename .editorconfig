@@ -358,7 +358,7 @@ dotnet_naming_style.camelcase.word_separator =
 dotnet_naming_style.camelcase.capitalization = camel_case
 
 dotnet_naming_style.s_camelcase.required_prefix = s_
-dotnet_naming_style.s_camelcase.required_suffix = 
+dotnet_naming_style.s_camelcase.required_suffix =
 dotnet_naming_style.s_camelcase.word_separator = 
 dotnet_naming_style.s_camelcase.capitalization = camel_case
 
@@ -374,3 +374,12 @@ dotnet_analyzer_diagnostic.category-StyleCop.CSharp.SpacingRules.severity = none
 
 # Default severity for analyzer diagnostics with category 'StyleCop.CSharp.OrderingRules'
 dotnet_analyzer_diagnostic.category-StyleCop.CSharp.OrderingRules.severity = none
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none
+
+# Disable SA1633 rule
+dotnet_diagnostic.SA1633.severity = none
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.NamingRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.NamingRules.severity = none

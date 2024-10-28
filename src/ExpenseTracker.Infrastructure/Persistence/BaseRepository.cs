@@ -2,47 +2,50 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 
 namespace ExpenseTracker.Infrastructure.Persistence;
 
-public class BaseRepository<T> : IBaseRepository<T> where T : class
+public class BaseRepository<T> : IBaseRepository<T>
+    where T : class
 {
-    protected readonly IDbRepository dbRepository;
-    protected readonly string tableName;
+    private readonly IDbRepository _dbRepository;
+    private readonly string _tableName;
 
     public BaseRepository(IDbRepository dbRepository, string tableName)
     {
-        this.dbRepository = dbRepository;
-        this.tableName = tableName;
+        this._dbRepository = dbRepository;
+        this._tableName = tableName;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
     {
         string sql = "SELECT * FROM " + typeof(T).Name + "s";
-        return await this.dbRepository.QueryAsync<T>(sql);
+        return await this._dbRepository.QueryAsync<T>(sql);
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
         string sql = "SELECT * FROM " + typeof(T).Name + "s WHERE Id = @Id";
-        return await this.dbRepository.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
+        return await this._dbRepository.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
     }
 
-    // public async Task<int> AddAsync(T obj)
-    // {
-    //     var (columnNames, parameterNames, _) = Base.GetInsertAndUpdateColumns<T>();
-    //     string sql = $"INSERT INTO {typeof(T).Name}s ({columnNames}) VALUES ({parameterNames})";
-    //     return await _dbRepository.ExecuteAsync(sql, obj);
-    // }
+    public async Task<int> AddAsync(T obj)
+    {
+        string insertClause = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
+        string valuesClause = string.Join(", ", typeof(T).GetProperties().Select(p => "@" + p.Name));
 
-    // public async Task<int> UpdateAsync(T obj)
-    // {
-    //     var (_, _, setClause) = Base.GetInsertAndUpdateColumns<T>();
-    //     string sql = $"UPDATE {typeof(T).Name}s SET {setClause} WHERE Id = @Id";
-    //     return await _dbRepository.ExecuteAsync(sql, obj);
-    // }
+        string sql = $"INSERT INTO {typeof(T).Name}s ({insertClause}) VALUES ({valuesClause})";
+        return await this._dbRepository.ExecuteAsync(sql, obj);
+    }
+
+    public async Task<int> UpdateAsync(T obj)
+    {
+        string updateClause = string.Join(", ", typeof(T).GetProperties().Where(p => p.Name != "Id").Select(p => $"{p.Name} = @{p.Name}"));
+        string sql = $"UPDATE {typeof(T).Name}s SET {updateClause} WHERE Id = @Id";
+        return await this._dbRepository.ExecuteAsync(sql, obj);
+    }
 
 
     public async Task<int> DeleteAsync(Guid id)
     {
         string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";
-        return await this.dbRepository.ExecuteAsync(sql, new { Id = id });
+        return await this._dbRepository.ExecuteAsync(sql, new { Id = id });
     }
 }

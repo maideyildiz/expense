@@ -1,9 +1,9 @@
-using System.Data;
-using Dapper;
-using ExpenseTracker.Application.Common.Interfaces.Persistence;
-using MySqlConnector;
-
 namespace ExpenseTracker.Infrastructure.Persistence;
+using Dapper;
+using MySqlConnector;
+using System.Data;
+using ExpenseTracker.Application.Common.Interfaces.Persistence;
+
 
 public class DbRepository : IDbRepository
 {
