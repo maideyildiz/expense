@@ -25,9 +25,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
     {
         var user = await this._userRepository.GetUserByEmailAsync(command.Email);
         if (user is not null)
-        {
             return Errors.Authentication.InvalidCredentials;
-        }
+
 
         Subscription subs = Subscription.Create("Free", "Free", decimal.One);
         //create user
@@ -45,15 +44,18 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
             subs);
 
 
-        await this._userRepository.AddAsync(newUser);
+        var result = await this._userRepository.AddAsync(newUser);
+
+        if (result is 0)
+            return Errors.Authentication.InvalidCredentials;
+
+
         //create token
-
-        //return token
         var token = this._jwtTokenGenerator.GenerateToken(newUser.Id.Value, newUser.FirstName, newUser.LastName, newUser.Subscription.Name);
-
         return new AuthenticationResult(
             user,
             token);
+
 
     }
 }
