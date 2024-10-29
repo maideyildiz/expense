@@ -9,7 +9,7 @@ public sealed class Subscription : Entity<SubscriptionId>
     public string Description { get; }
     public decimal MonthlyCost { get; }
 
-    public Subscription(SubscriptionId id, string name, string description, decimal monthlyCost)
+    private Subscription(SubscriptionId id, string name, string description, decimal monthlyCost)
         : base(id)
     {
         this.Name = name;

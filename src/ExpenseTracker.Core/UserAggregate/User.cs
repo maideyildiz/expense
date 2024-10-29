@@ -1,4 +1,6 @@
+using ExpenseTracker.Core.Common.Entities;
 using ExpenseTracker.Core.Common.Models;
+using ExpenseTracker.Core.Common.ValueObjects;
 using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
 using ExpenseTracker.Core.InvestmentAggregate.ValueObjects;
 using ExpenseTracker.Core.UserAggregate.Entities;
@@ -20,7 +22,8 @@ public class User : AggregateRoot<UserId>
     public DateTime UpdatedAt { get; }
     public DateTime LastLoginAt { get; }
     public bool IsActive { get; }
-    public Subscription Subscription { get; }
+    public SubscriptionId SubscriptionId { get; }
+    public CityId CityId { get; }
     public IReadOnlyList<ExpenseId> ExpenseIds => this.expenseIds.AsReadOnly();
     public IReadOnlyList<InvestmentId> InvestmentIds => this.investmentIds.AsReadOnly();
 
@@ -36,7 +39,8 @@ public class User : AggregateRoot<UserId>
         DateTime updatedAt,
         DateTime lastLoginAt,
         bool isActive,
-        Subscription subscription)
+        SubscriptionId subscriptionId,
+        CityId cityId)
         : base(id)
     {
         this.FirstName = firstName;
@@ -49,7 +53,8 @@ public class User : AggregateRoot<UserId>
         this.UpdatedAt = updatedAt;
         this.LastLoginAt = lastLoginAt;
         this.IsActive = isActive;
-        this.Subscription = subscription;
+        this.SubscriptionId = subscriptionId;
+        this.CityId = cityId;
     }
 
     public static User Create(
@@ -63,7 +68,8 @@ public class User : AggregateRoot<UserId>
         DateTime updatedAt,
         DateTime lastLoginAt,
         bool isActive,
-        Subscription subscription)
+        SubscriptionId subscriptionId,
+        CityId cityId)
     {
         return new(UserId.CreateUnique(),
                     firstName,
@@ -76,6 +82,7 @@ public class User : AggregateRoot<UserId>
                     updatedAt,
                     lastLoginAt,
                     isActive,
-                    subscription);
+                    subscriptionId,
+                    cityId);
     }
 }
