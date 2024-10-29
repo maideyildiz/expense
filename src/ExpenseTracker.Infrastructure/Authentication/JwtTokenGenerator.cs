@@ -17,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         this.jwtSettings = jwtOptions.Value;
         this.dateTimeProvider = dateTimeProvider;
     }
-    public string GenerateToken(Guid id, string name, string surname)
+    public string GenerateToken(Guid id, string name, string surname, string subscriptionName = "")
     {
         var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
 

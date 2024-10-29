@@ -7,5 +7,7 @@ public record RegisterCommand(
     string FirstName,
     string LastName,
     string Email,
-    string Password)
+    string Password,
+    Guid CityId,
+    Guid SubscriptionId)
     : IRequest<ErrorOr<AuthenticationResult>>;

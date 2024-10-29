@@ -62,14 +62,10 @@ public class User : AggregateRoot<UserId>
         string lastName,
         string email,
         string passwordHash,
-        decimal mothlySalary,
-        decimal yearlySalary,
-        DateTime createdAt,
-        DateTime updatedAt,
-        DateTime lastLoginAt,
-        bool isActive,
         SubscriptionId subscriptionId,
-        CityId cityId)
+        CityId cityId,
+        decimal mothlySalary = decimal.Zero,
+        decimal yearlySalary = decimal.Zero)
     {
         return new(UserId.CreateUnique(),
                     firstName,
@@ -78,10 +74,10 @@ public class User : AggregateRoot<UserId>
                     passwordHash,
                     mothlySalary,
                     yearlySalary,
-                    createdAt,
-                    updatedAt,
-                    lastLoginAt,
-                    isActive,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow,
+                    true,
                     subscriptionId,
                     cityId);
     }
