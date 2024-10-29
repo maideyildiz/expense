@@ -11,6 +11,7 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Infrastructure.Authentication;
 using ExpenseTracker.Infrastructure.Persistence;
 using ExpenseTracker.Infrastructure.Services;
+using ExpenseTracker.Infrastructure.Database;
 
 public static class DependencyInjection
 {
@@ -18,11 +19,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
+        services.AddDbConnection(configuration);
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<IDbRepository, DbRepository>();
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        //services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 
@@ -49,6 +48,20 @@ public static class DependencyInjection
                         Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
                 });
 
+        return services;
+    }
+
+    public static IServiceCollection AddDbConnection(
+        this IServiceCollection services,
+        ConfigurationManager configuration)
+    {
+        var dbSettings = new DatabaseSettings();
+        configuration.Bind(DatabaseSettings.SectionName, dbSettings);
+        services.AddSingleton(Options.Create(dbSettings));
+        services.AddScoped<IDbRepository>(provider => new DbRepository(dbSettings.DefaultConnection));
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
+        //services.AddScoped<IUserRepository>(provider => new UserRepository(provider.GetRequiredService<IDbRepository>()));
         return services;
     }
 }

@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseCors("AllowAllOrigins");
-app.UseExceptionHandler("error/");
+app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -2,13 +2,12 @@ namespace ExpenseTracker.Infrastructure.Persistence;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.UserAggregate;
 
-
 public class UserRepository : BaseRepository<User>, IUserRepository
 {
     private new readonly IDbRepository _dbRepository;
 
-    public UserRepository(IDbRepository dbRepository, string tableName)
-        : base(dbRepository, tableName)
+    public UserRepository(IDbRepository dbRepository)
+        : base(dbRepository, "Users")
     {
         this._dbRepository = dbRepository;
     }
