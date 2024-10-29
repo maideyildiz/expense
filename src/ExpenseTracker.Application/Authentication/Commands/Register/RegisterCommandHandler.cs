@@ -1,5 +1,3 @@
-
-namespace ExpenseTracker.Application.Authentication.Commands.Register;
 using ErrorOr;
 using MediatR;
 using ExpenseTracker.Application.Authentication.Common;
@@ -8,6 +6,7 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Core.Common.Errors;
 using ExpenseTracker.Core.UserAggregate;
 using ExpenseTracker.Core.UserAggregate.Entities;
+namespace ExpenseTracker.Application.Authentication.Commands.Register;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {

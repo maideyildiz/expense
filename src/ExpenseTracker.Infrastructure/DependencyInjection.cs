@@ -58,7 +58,8 @@ public static class DependencyInjection
         var dbSettings = new DatabaseSettings();
         configuration.Bind(DatabaseSettings.SectionName, dbSettings);
         services.AddSingleton(Options.Create(dbSettings));
-        services.AddScoped<IDbRepository>(provider => new DbRepository(dbSettings.DefaultConnection));
+        services.AddScoped<IDbConnectionFactory>(provider => new MySqlConnectionFactory(dbSettings.DefaultConnection));
+        services.AddScoped<IDbRepository, DbRepository>();
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         //services.AddScoped<IUserRepository>(provider => new UserRepository(provider.GetRequiredService<IDbRepository>()));
