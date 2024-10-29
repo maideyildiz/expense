@@ -2,6 +2,7 @@ using ExpenseTracker.API;
 using ExpenseTracker.API.Common.Errors;
 using ExpenseTracker.Application;
 using ExpenseTracker.Infrastructure;
+using ExpenseTracker.Infrastructure.Database.Extensions;
 
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -26,6 +27,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.MigrateDatabase();
+
 // Geliştirme ortamında Swagger UI kullan
 if (app.Environment.IsDevelopment())
 {
@@ -40,7 +43,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseCors("AllowAllOrigins");
-app.UseExceptionHandler("error/");
+app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

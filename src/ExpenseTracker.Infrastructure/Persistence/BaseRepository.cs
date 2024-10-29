@@ -6,12 +6,10 @@ public class BaseRepository<T> : IBaseRepository<T>
     where T : class
 {
     private readonly IDbRepository _dbRepository;
-    private readonly string _tableName;
 
-    public BaseRepository(IDbRepository dbRepository, string tableName)
+    public BaseRepository(IDbRepository dbRepository)
     {
         this._dbRepository = dbRepository;
-        this._tableName = tableName;
     }
 
     public async Task<IEnumerable<T>> GetAllAsync()
