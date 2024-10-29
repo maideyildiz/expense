@@ -27,33 +27,35 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
             return Errors.Authentication.InvalidCredentials;
 
 
-        Subscription subs = Subscription.Create("Free", "Free", decimal.One);
-        //create user
-        var newUser = User.Create(
-            command.FirstName,
-            command.LastName,
-            command.Email,
-            command.Password,
-            0,
-            0,
-            DateTime.Now,
-            DateTime.Now,
-            DateTime.Now,
-            true,
-            subs);
+        // Subscription subs = Subscription.Create("Free", "Free", decimal.One);
+        // //create user
+        // var newUser = User.Create(
+        //     command.FirstName,
+        //     command.LastName,
+        //     command.Email,
+        //     command.Password,
+        //     0,
+        //     0,
+        //     DateTime.Now,
+        //     DateTime.Now,
+        //     DateTime.Now,
+        //     true,
+        //     subs);
 
 
-        var result = await this._userRepository.AddAsync(newUser);
+        // var result = await this._userRepository.AddAsync(newUser);
 
-        if (result is 0)
-            return Errors.Authentication.InvalidCredentials;
+        // if (result is 0)
+        //     return Errors.Authentication.InvalidCredentials;
 
 
-        //create token
-        var token = this._jwtTokenGenerator.GenerateToken(newUser.Id.Value, newUser.FirstName, newUser.LastName, newUser.Subscription.Name);
-        return new AuthenticationResult(
-            user,
-            token);
+        // //create token
+        // var token = this._jwtTokenGenerator.GenerateToken(newUser.Id.Value, newUser.FirstName, newUser.LastName, newUser.Subscription.Name);
+        // return new AuthenticationResult(
+        //     user,
+        //     token);
+
+        return new AuthenticationResult(user, "token");
 
 
     }

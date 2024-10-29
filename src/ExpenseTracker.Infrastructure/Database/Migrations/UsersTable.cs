@@ -3,7 +3,7 @@ using FluentMigrator.Builders.Create.Table;
 
 using Microsoft.Extensions.Logging;
 namespace ExpenseTracker.Infrastructure.Database.Migrations;
-[Migration(2024102901)]
+[Migration(2024102905)]
 public class UsersTable : Migration
 {
     public override void Up()

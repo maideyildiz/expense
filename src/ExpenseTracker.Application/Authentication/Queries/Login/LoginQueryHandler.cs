@@ -26,7 +26,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
             return Errors.Authentication.InvalidCredentials;
         }
 
-        var token = this._jwtTokenGenerator.GenerateToken(user.Id.Value, user.FirstName, user.LastName, user.Subscription.Name);
+        var token = this._jwtTokenGenerator.GenerateToken(user.Id.Value, user.FirstName, user.LastName);
 
         return new AuthenticationResult(
             user,

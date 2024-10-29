@@ -1,7 +1,7 @@
 using FluentMigrator;
 
 namespace ExpenseTracker.Infrastructure.Database.Migrations;
-[Migration(2024102903)]
+[Migration(2024102906)]
 public class InvestmentsTable : Migration
 {
     public override void Up()

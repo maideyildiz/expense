@@ -7,7 +7,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     private new readonly IDbRepository _dbRepository;
 
     public UserRepository(IDbRepository dbRepository)
-        : base(dbRepository, "Users")
+        : base(dbRepository)
     {
         this._dbRepository = dbRepository;
     }

@@ -17,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         this.jwtSettings = jwtOptions.Value;
         this.dateTimeProvider = dateTimeProvider;
     }
-    public string GenerateToken(Guid id, string name, string surname, string subscriptionName)
+    public string GenerateToken(Guid id, string name, string surname)
     {
         var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
 
@@ -27,7 +27,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.GivenName, name),
             new Claim(JwtRegisteredClaimNames.FamilyName, surname),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, subscriptionName), // Add user roles if necessary
+            //new Claim(ClaimTypes.Role, subscriptionName), // Add user roles if necessary
         };
 
         var tokenDescriptor = new JwtSecurityToken(
@@ -42,7 +42,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public string RevokeToken(string token)
     {
-        return this.GenerateToken(Guid.Parse(token), string.Empty, string.Empty, string.Empty);
+        return this.GenerateToken(Guid.Parse(token), string.Empty, string.Empty);
     }
 
     public ClaimsPrincipal? ValidateToken(string token)

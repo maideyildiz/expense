@@ -12,6 +12,9 @@ using ExpenseTracker.Infrastructure.Authentication;
 using ExpenseTracker.Infrastructure.Persistence;
 using ExpenseTracker.Infrastructure.Services;
 using ExpenseTracker.Infrastructure.Database;
+using FluentMigrator.Runner.Logging;
+using FluentMigrator.Runner;
+using System.Reflection;
 
 public static class DependencyInjection
 {
@@ -20,6 +23,8 @@ public static class DependencyInjection
         ConfigurationManager configuration)
     {
         services.AddDbConnection(configuration);
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         return services;
@@ -59,10 +64,15 @@ public static class DependencyInjection
         configuration.Bind(DatabaseSettings.SectionName, dbSettings);
         services.AddSingleton(Options.Create(dbSettings));
         services.AddScoped<IDbConnectionFactory>(provider => new MySqlConnectionFactory(dbSettings.DefaultConnection));
+
+        services.AddLogging(c => c.AddFluentMigratorConsole())
+            .AddFluentMigratorCore()
+            .ConfigureRunner(c => c.AddMySql5()
+                .WithGlobalConnectionString(dbSettings.DefaultConnection)
+                .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations());
+
         services.AddScoped<IDbRepository, DbRepository>();
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        services.AddScoped<IUserRepository, UserRepository>();
-        //services.AddScoped<IUserRepository>(provider => new UserRepository(provider.GetRequiredService<IDbRepository>()));
+
         return services;
     }
 }
