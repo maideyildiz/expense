@@ -11,6 +11,10 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Infrastructure.Authentication;
 using ExpenseTracker.Infrastructure.Persistence;
 using ExpenseTracker.Infrastructure.Services;
+using ExpenseTracker.Infrastructure.Database;
+using FluentMigrator.Runner.Logging;
+using FluentMigrator.Runner;
+using System.Reflection;
 
 public static class DependencyInjection
 {
@@ -18,11 +22,11 @@ public static class DependencyInjection
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
+        services.AddDbConnection(configuration);
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<IDbRepository, DbRepository>();
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        //services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 
@@ -48,6 +52,26 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
                 });
+
+        return services;
+    }
+
+    public static IServiceCollection AddDbConnection(
+        this IServiceCollection services,
+        ConfigurationManager configuration)
+    {
+        var dbSettings = new DatabaseSettings();
+        configuration.Bind(DatabaseSettings.SectionName, dbSettings);
+        services.AddSingleton(Options.Create(dbSettings));
+        services.AddScoped<IDbConnectionFactory>(provider => new MySqlConnectionFactory(dbSettings.DefaultConnection));
+
+        services.AddLogging(c => c.AddFluentMigratorConsole())
+            .AddFluentMigratorCore()
+            .ConfigureRunner(c => c.AddMySql5()
+                .WithGlobalConnectionString(dbSettings.DefaultConnection)
+                .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations());
+
+        services.AddScoped<IDbRepository, DbRepository>();
 
         return services;
     }

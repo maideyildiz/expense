@@ -7,19 +7,13 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 
 public class DbRepository : IDbRepository
 {
-    private readonly string connectionString;
+    private readonly IDbConnectionFactory _connectionFactory;
 
-    public DbRepository(string connectionString)
+    public DbRepository(IDbConnectionFactory connectionFactory)
     {
-        this.connectionString = connectionString;
+        _connectionFactory = connectionFactory;
     }
-
-    private IDbConnection CreateConnection()
-    {
-        var connection = new MySqlConnection(this.connectionString);
-        connection.Open();
-        return connection;
-    }
+    private IDbConnection CreateConnection() => _connectionFactory.CreateConnection();
 
     public async Task<int> ExecuteAsync(string sql, object? param = null)
     {
