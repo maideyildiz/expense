@@ -1,10 +1,9 @@
 using ExpenseTracker.Core.Common.Entities;
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.ExpenseAggregateRoot.ValueObjests;
+using ExpenseTracker.Core.Common.ValueObjects;
 using ExpenseTracker.Core.InvestmentAggregate.ValueObjects;
 using ExpenseTracker.Core.UserAggregate.ValueObjects;
 
-using InvestmentTracker.Core.InvestmentAggregateRoot.ValueObjests;
 
 namespace ExpenseTracker.Core.InvestmentAggregate;
 
@@ -15,7 +14,7 @@ public class Investment : AggregateRoot<InvestmentId>
     public DateTime UpdatedAt { get; }
     public string Description { get; }
     public UserId UserId { get; }
-    public InvestmentCategoryId InvestmentCategoryId { get; }
+    public CategoryId CategoryId { get; }
     private Investment(
         InvestmentId id,
         decimal amount,
@@ -23,14 +22,14 @@ public class Investment : AggregateRoot<InvestmentId>
         DateTime updatedAt,
         string description,
         UserId userId,
-        InvestmentCategoryId investmentCategoryId)
+        CategoryId categoryId)
         : base(id)
     {
         this.Amount = amount;
         this.CreatedAt = createdAt;
         this.UpdatedAt = updatedAt;
         this.Description = description;
-        this.InvestmentCategoryId = investmentCategoryId;
+        this.CategoryId = categoryId;
         this.UserId = userId;
     }
 
@@ -41,8 +40,8 @@ public class Investment : AggregateRoot<InvestmentId>
         DateTime updatedAt,
         string description,
         UserId userId,
-        InvestmentCategoryId investmentCategoryId)
+        CategoryId categoryId)
     {
-        return new(id, amount, createdAt, updatedAt, description, userId, investmentCategoryId);
+        return new(id, amount, createdAt, updatedAt, description, userId, categoryId);
     }
 }

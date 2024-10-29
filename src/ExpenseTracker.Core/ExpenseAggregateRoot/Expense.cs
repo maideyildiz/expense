@@ -1,7 +1,6 @@
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.ExpenseAggregate.Entities;
+using ExpenseTracker.Core.Common.ValueObjects;
 using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
-using ExpenseTracker.Core.ExpenseAggregateRoot.ValueObjests;
 using ExpenseTracker.Core.UserAggregate.ValueObjects;
 namespace ExpenseTracker.Core.ExpenseAggregate;
 
@@ -11,7 +10,7 @@ public class Expense : AggregateRoot<ExpenseId>
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; }
     public string Description { get; }
-    public ExpenseCategoryId ExpenseCategoryId { get; }
+    public CategoryId CategoryId { get; }
     public UserId UserId { get; }
 
     private Expense(
@@ -20,7 +19,7 @@ public class Expense : AggregateRoot<ExpenseId>
         DateTime createdAt,
         DateTime updatedAt,
         string description,
-        ExpenseCategoryId expenseCategoryId,
+        CategoryId categoryId,
         UserId userId)
         : base(id)
     {
@@ -28,7 +27,7 @@ public class Expense : AggregateRoot<ExpenseId>
         this.CreatedAt = createdAt;
         this.UpdatedAt = updatedAt;
         this.Description = description;
-        this.ExpenseCategoryId = expenseCategoryId;
+        this.CategoryId = categoryId;
         this.UserId = userId;
     }
 
@@ -38,7 +37,7 @@ public class Expense : AggregateRoot<ExpenseId>
         DateTime createdAt,
         DateTime updatedAt,
         string description,
-        ExpenseCategoryId expenseCategoryId,
+        CategoryId categoryId,
         UserId userId)
     {
         return new(
@@ -47,7 +46,7 @@ public class Expense : AggregateRoot<ExpenseId>
             createdAt,
             updatedAt,
             description,
-            expenseCategoryId,
+            categoryId,
             userId);
     }
 }

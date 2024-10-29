@@ -19,6 +19,7 @@ public class CitiesTable : Migration
 
     public override void Down()
     {
+        Delete.ForeignKey("FK_Cities_Countries").OnTable("Cities");
         Delete.Table("Cities");
     }
 }

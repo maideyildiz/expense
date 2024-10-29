@@ -1,15 +1,15 @@
 using ExpenseTracker.Core.Common.Models;
 
-namespace InvestmentTracker.Core.InvestmentAggregateRoot.ValueObjests;
+namespace ExpenseTracker.Core.Common.ValueObjects;
 
-public sealed class InvestmentCategoryId : ValueObject
+public sealed class CategoryId : ValueObject
 {
     public Guid Value { get; }
-    private InvestmentCategoryId(Guid value)
+    private CategoryId(Guid value)
     {
         Value = value;
     }
-    public static InvestmentCategoryId CreateUnique()
+    public static CategoryId CreateUnique()
     {
         return new(Guid.NewGuid());
     }

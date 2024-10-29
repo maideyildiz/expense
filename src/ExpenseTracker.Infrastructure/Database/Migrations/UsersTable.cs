@@ -22,10 +22,20 @@ public class UsersTable : Migration
             .WithColumn("IsActive").AsBoolean().NotNullable()
             .WithColumn("SubscriptionId").AsGuid().NotNullable()
             .WithColumn("CityId").AsGuid().NotNullable();
+
+        Create.ForeignKey("FK_Users_Subscriptions")
+        .FromTable("Users").ForeignColumn("SubscriptionId")
+        .ToTable("Subscriptions").PrimaryColumn("Id");
+
+        Create.ForeignKey("FK_Users_Cities")
+        .FromTable("Users").ForeignColumn("CityId")
+        .ToTable("Cities").PrimaryColumn("Id");
     }
 
     public override void Down()
     {
+        Delete.ForeignKey("FK_Users_Subscriptions").OnTable("Users");
+        Delete.ForeignKey("FK_Users_Cities").OnTable("Users");
         Delete.Table("Users");
     }
 }
