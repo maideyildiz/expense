@@ -15,6 +15,9 @@ using ExpenseTracker.Infrastructure.Database;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner;
 using System.Reflection;
+using Serilog;
+using Serilog.Sinks.MariaDB.Extensions;
+using ExpenseTracker.Infrastructure.Logging.Services;
 
 public static class DependencyInjection
 {
@@ -23,6 +26,7 @@ public static class DependencyInjection
         ConfigurationManager configuration)
     {
         services.AddDbConnection(configuration);
+        services.AddCustomLogging(configuration);
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddAuth(configuration);
@@ -72,6 +76,25 @@ public static class DependencyInjection
                 .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations());
 
         services.AddScoped<IDbRepository, DbRepository>();
+
+        return services;
+    }
+
+    // Custom logging method to avoid confusion with built-in logging
+    public static IServiceCollection AddCustomLogging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<ILogService, LogService>();
+
+        var dbSettings = new DatabaseSettings();
+        configuration.Bind(DatabaseSettings.SectionName, dbSettings);
+
+        Serilog.Log.Logger = new LoggerConfiguration()
+            .WriteTo.MariaDB(
+                connectionString: dbSettings.DefaultConnection,
+                tableName: "Logs",
+                autoCreateTable: true).CreateLogger();
+
+        services.AddSingleton(Serilog.Log.Logger);
 
         return services;
     }
