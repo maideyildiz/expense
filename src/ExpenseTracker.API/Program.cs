@@ -3,6 +3,7 @@ using ExpenseTracker.API.Common.Errors;
 using ExpenseTracker.Application;
 using ExpenseTracker.Infrastructure;
 using ExpenseTracker.Infrastructure.Database.Extensions;
+using ExpenseTracker.Infrastructure.Logging;
 
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -42,6 +43,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // Swagger'ı kök dizinde göstermek için
     });
 }
+app.UseMiddleware<LoggingMiddleware>();
 app.UseCors("AllowAllOrigins");
 app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
