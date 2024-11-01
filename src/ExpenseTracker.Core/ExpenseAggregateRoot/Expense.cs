@@ -6,12 +6,12 @@ namespace ExpenseTracker.Core.ExpenseAggregate;
 
 public class Expense : AggregateRoot<ExpenseId>
 {
-    public decimal Amount { get; }
-    public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; }
-    public string Description { get; }
-    public CategoryId CategoryId { get; }
-    public UserId UserId { get; }
+    public decimal Amount { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public string Description { get; private set; }
+    public CategoryId CategoryId { get; private set; }
+    public UserId UserId { get; private set; }
 
     private Expense(
         ExpenseId id,

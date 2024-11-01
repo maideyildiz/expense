@@ -12,18 +12,18 @@ public class User : AggregateRoot<UserId>
 {
     private readonly List<ExpenseId> expenseIds = new();
     private readonly List<InvestmentId> investmentIds = new();
-    public string FirstName { get; }
-    public string LastName { get; }
-    public string Email { get; }
-    public string PasswordHash { get; }
-    public decimal MothlySalary { get; }
-    public decimal YearlySalary { get; }
-    public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; }
-    public DateTime LastLoginAt { get; }
-    public bool IsActive { get; }
-    public SubscriptionId SubscriptionId { get; }
-    public CityId CityId { get; }
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public string Email { get; private set; }
+    public string PasswordHash { get; private set; }
+    public decimal MothlySalary { get; private set; }
+    public decimal YearlySalary { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime LastLoginAt { get; private set; }
+    public bool IsActive { get; private set; }
+    public SubscriptionId SubscriptionId { get; private set; }
+    public CityId CityId { get; private set; }
     public IReadOnlyList<ExpenseId> ExpenseIds => this.expenseIds.AsReadOnly();
     public IReadOnlyList<InvestmentId> InvestmentIds => this.investmentIds.AsReadOnly();
 

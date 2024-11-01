@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.Common.Interfaces.Persistence;
+namespace ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 public interface IBaseRepository<T>
     where T : class
 {

@@ -5,9 +5,9 @@ namespace ExpenseTracker.Core.UserAggregate.Entities;
 
 public sealed class Subscription : Entity<SubscriptionId>
 {
-    public string Name { get; }
-    public string Description { get; }
-    public decimal MonthlyCost { get; }
+    public string Name { get; private set; }
+    public string Description { get; private set; }
+    public decimal MonthlyCost { get; private set; }
 
     private Subscription(SubscriptionId id, string name, string description, decimal monthlyCost)
         : base(id)

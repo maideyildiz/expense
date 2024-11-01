@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.Common.Interfaces.Persistence;
+namespace ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 public interface IDbRepository
 {
     Task<int> ExecuteAsync(string sql, object? param = null);

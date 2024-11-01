@@ -5,9 +5,9 @@ namespace ExpenseTracker.Core.Common.Entities;
 
 public class City : Entity<CityId>
 {
-    public string Name { get; }
-    public Country Country { get; }
-    public string ThreeLetterUAVTCode { get; }
+    public string Name { get; private set; }
+    public Country Country { get; private set; }
+    public string ThreeLetterUAVTCode { get; private set; }
 
     private City(CityId id, string name, Country country, string threeLetterUAVTCode)
         : base(id)

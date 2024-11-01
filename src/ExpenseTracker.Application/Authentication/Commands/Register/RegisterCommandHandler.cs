@@ -7,6 +7,7 @@ using ExpenseTracker.Core.Common.Errors;
 using ExpenseTracker.Core.UserAggregate;
 using ExpenseTracker.Core.UserAggregate.Entities;
 using ExpenseTracker.Core.Common.Entities;
+using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 namespace ExpenseTracker.Application.Authentication.Commands.Register;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>

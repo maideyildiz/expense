@@ -18,6 +18,8 @@ using System.Reflection;
 using Serilog;
 using Serilog.Sinks.MariaDB.Extensions;
 using ExpenseTracker.Infrastructure.Logging.Services;
+using ExpenseTracker.Infrastructure.Persistence.Repositories;
+using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 
 public static class DependencyInjection
 {
