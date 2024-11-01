@@ -60,7 +60,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
                 ValidIssuer = this.jwtSettings.Issuer,
                 ValidateAudience = true,
                 ValidAudience = this.jwtSettings.Audience,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
             }, out SecurityToken validatedToken);
 
             return claimsPrincipal;
