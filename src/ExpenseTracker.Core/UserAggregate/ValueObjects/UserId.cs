@@ -4,7 +4,7 @@ namespace ExpenseTracker.Core.UserAggregate.ValueObjects;
 
 public sealed class UserId : ValueObject
 {
-    public Guid Value { get; }
+    public Guid Value { get; private set; }
     private UserId(Guid value)
     {
         this.Value = value;

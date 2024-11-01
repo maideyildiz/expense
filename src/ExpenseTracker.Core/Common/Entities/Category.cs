@@ -8,10 +8,10 @@ namespace ExpenseTracker.Core.Common.Entities;
 
 public class Category : Entity<CategoryId>
 {
-    public string Name { get; }
-    public string Description { get; }
+    public string Name { get; private set; }
+    public string Description { get; private set; }
 
-    public CategoryType CategoryType { get; }
+    public CategoryType CategoryType { get; private set; }
     private Category(CategoryId id, string name, string description, CategoryType categoryType)
         : base(id)
     {

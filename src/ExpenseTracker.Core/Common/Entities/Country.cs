@@ -6,8 +6,8 @@ namespace ExpenseTracker.Core.Common.Entities;
 public class Country : Entity<CountryId>
 {
     private readonly List<CityId> _cityIds = new();
-    public string Name { get; }
-    public string ThreeLetterUAVTCode { get; }
+    public string Name { get; private set; }
+    public string ThreeLetterUAVTCode { get; private set; }
     public IReadOnlyList<CityId> CityIds => this._cityIds.AsReadOnly();
     private Country(CountryId id, string name, string threeLetterUAVTCode)
         : base(id)
