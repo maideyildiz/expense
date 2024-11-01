@@ -1,5 +1,3 @@
-using ExpenseTracker.Infrastructure.Logging.Enums;
-
 namespace ExpenseTracker.Infrastructure.Logging.Services;
 
 public interface ILogService
