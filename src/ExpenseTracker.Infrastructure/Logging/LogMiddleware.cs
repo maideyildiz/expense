@@ -26,7 +26,7 @@ public class LoggingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error handling request: {ex.Message}", null, ex.ToString());
+            _logger.LogError($"Error handling request: {ex.Message}", null, ex);
             throw;
         }
     }

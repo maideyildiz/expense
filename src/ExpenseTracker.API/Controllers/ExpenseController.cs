@@ -1,13 +1,9 @@
-using ErrorOr;
-
-using ExpenseTracker.Contracts.ExpenseOperations;
-
-using MapsterMapper;
-
-using MediatR;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ErrorOr;
+using ExpenseTracker.Contracts.ExpenseOperations;
+using MapsterMapper;
+using MediatR;
 
 namespace ExpenseTracker.API.Controllers;
 

@@ -1,15 +1,14 @@
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.Common.ValueObjects;
 
 namespace ExpenseTracker.Core.Common.Entities;
 
-public class Country : Entity<CountryId>
+public class Country : Entity<Guid>
 {
-    private readonly List<CityId> _cityIds = new();
+    private readonly List<Guid> _cityIds = new();
     public string Name { get; private set; }
     public string ThreeLetterUAVTCode { get; private set; }
-    public IReadOnlyList<CityId> CityIds => this._cityIds.AsReadOnly();
-    private Country(CountryId id, string name, string threeLetterUAVTCode)
+    public IReadOnlyList<Guid> CityIds => this._cityIds.AsReadOnly();
+    private Country(Guid id, string name, string threeLetterUAVTCode)
         : base(id)
     {
         Name = name;
@@ -18,6 +17,6 @@ public class Country : Entity<CountryId>
 
     public static Country Create(string name, string threeLetterUAVTCode)
     {
-        return new(CountryId.CreateUnique(), name, threeLetterUAVTCode);
+        return new(Guid.NewGuid(), name, threeLetterUAVTCode);
     }
 }

@@ -5,7 +5,7 @@ using ErrorOr;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using MediatR;
-using ExpenseTracker.Core.Common.Errors;
+using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Application.Authentication.Common;
 public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
 {
@@ -26,10 +26,9 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
             return Errors.Authentication.InvalidCredentials;
         }
 
-        var token = this._jwtTokenGenerator.GenerateToken(user.Id.Value, user.FirstName, user.LastName);
+        var token = this._jwtTokenGenerator.GenerateToken(user);
 
         return new AuthenticationResult(
-            user,
             token);
     }
 }

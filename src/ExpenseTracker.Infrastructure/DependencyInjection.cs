@@ -20,6 +20,8 @@ using Serilog.Sinks.MariaDB.Extensions;
 using ExpenseTracker.Infrastructure.Logging.Services;
 using ExpenseTracker.Infrastructure.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
+using ExpenseTracker.Core.Common.Models;
+using Dapper;
 
 public static class DependencyInjection
 {
@@ -30,7 +32,10 @@ public static class DependencyInjection
         services.AddDbConnection(configuration);
         services.AddCustomLogging(configuration);
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<ICityRepository, CityRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserService, UserService>();
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         return services;

@@ -1,3 +1,5 @@
+using ExpenseTracker.Infrastructure.Logging.Services;
+
 using FluentMigrator.Runner;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -12,17 +14,19 @@ public static class MigrationManager
         using (var scope = host.Services.CreateScope())
         {
             var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogService>();
             try
             {
                 migrationService.ListMigrations();
                 migrationService.MigrateUp();
             }
-            catch
+            catch (Exception ex)
             {
-                //log errors or ...
+                logger.LogError("Migration failed", null, ex);
                 throw;
             }
         }
         return host;
     }
 }
+

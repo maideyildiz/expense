@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Services;
+using ExpenseTracker.Core.UserAggregate;
 
 namespace ExpenseTracker.Infrastructure.Authentication;
 
@@ -17,17 +18,17 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         this.jwtSettings = jwtOptions.Value;
         this.dateTimeProvider = dateTimeProvider;
     }
-    public string GenerateToken(Guid id, string name, string surname, string subscriptionName = "")
+    public string GenerateToken(User user)
     {
         var key = Encoding.ASCII.GetBytes(this.jwtSettings.SecretKey);
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
-            new Claim(JwtRegisteredClaimNames.GivenName, name),
-            new Claim(JwtRegisteredClaimNames.FamilyName, surname),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()!),
+            new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
+            new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //new Claim(ClaimTypes.Role, subscriptionName), // Add user roles if necessary
+            //new Claim(ClaimTypes.Role, user.SubscriptionId.ToString()!), // Add user roles if necessary
         };
 
         var tokenDescriptor = new JwtSecurityToken(
@@ -42,7 +43,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public string RevokeToken(string token)
     {
-        return this.GenerateToken(Guid.Parse(token), string.Empty, string.Empty);
+        return string.Empty;//this.GenerateToken(Guid.Parse(token), string.Empty, string.Empty);
     }
 
     public ClaimsPrincipal? ValidateToken(string token)

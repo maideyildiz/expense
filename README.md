@@ -11,6 +11,5 @@ Expense is a versatile expense tracking application currently focused on its API
 ## Planned Features
 
 - AI-powered receipt recognition.
-- AI-powered voice input for expense recording.
 - Integration with Elasticsearch.
 - Caching implementation. (In-Memory Caching, Response Caching, Redis, and Application-Level Caching)
