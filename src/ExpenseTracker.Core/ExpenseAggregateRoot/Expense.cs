@@ -1,26 +1,23 @@
 using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.Common.ValueObjects;
-using ExpenseTracker.Core.ExpenseAggregate.ValueObjests;
-using ExpenseTracker.Core.UserAggregate.ValueObjects;
 namespace ExpenseTracker.Core.ExpenseAggregate;
 
-public class Expense : AggregateRoot<ExpenseId>
+public class Expense : AggregateRoot<Guid>
 {
     public decimal Amount { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
     public string Description { get; private set; }
-    public CategoryId CategoryId { get; private set; }
-    public UserId UserId { get; private set; }
+    public Guid CategoryId { get; private set; }
+    public Guid UserId { get; private set; }
 
     private Expense(
-        ExpenseId id,
+        Guid id,
         decimal amount,
         DateTime createdAt,
         DateTime updatedAt,
         string description,
-        CategoryId categoryId,
-        UserId userId)
+        Guid categoryId,
+        Guid userId)
         : base(id)
     {
         this.Amount = amount;
@@ -32,16 +29,15 @@ public class Expense : AggregateRoot<ExpenseId>
     }
 
     public static Expense Create(
-        ExpenseId id,
         decimal amount,
         DateTime createdAt,
         DateTime updatedAt,
         string description,
-        CategoryId categoryId,
-        UserId userId)
+        Guid categoryId,
+        Guid userId)
     {
         return new(
-            id,
+            Guid.NewGuid(),
             amount,
             createdAt,
             updatedAt,

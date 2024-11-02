@@ -1,6 +1,6 @@
 using ErrorOr;
 
-namespace ExpenseTracker.Core.Common.Errors;
+namespace ExpenseTracker.Application.Common.Errors;
 
 public static partial class Errors
 {

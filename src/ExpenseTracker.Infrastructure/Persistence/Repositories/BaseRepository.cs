@@ -1,4 +1,5 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
+using ExpenseTracker.Core.Common.Models;
 
 namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
 
@@ -20,7 +21,7 @@ public class BaseRepository<T> : IBaseRepository<T>
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        string sql = "SELECT * FROM " + typeof(T).Name + "s WHERE Id = @Id";
+        string sql = $"SELECT * FROM {typeof(T).Name}s WHERE Id = @Id";
         return await _dbRepository.QueryFirstOrDefaultAsync<T>(sql, new { Id = id });
     }
 
@@ -39,8 +40,6 @@ public class BaseRepository<T> : IBaseRepository<T>
         string sql = $"UPDATE {typeof(T).Name}s SET {updateClause} WHERE Id = @Id";
         return await _dbRepository.ExecuteAsync(sql, obj);
     }
-
-
     public async Task<int> DeleteAsync(Guid id)
     {
         string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";

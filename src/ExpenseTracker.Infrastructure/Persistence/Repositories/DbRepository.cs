@@ -72,5 +72,21 @@ public class DbRepository : IDbRepository
             return await connection.ExecuteScalarAsync<int>(sql, param);
         }
     }
+
+    public async Task<IEnumerable<TResult>> QueryAsync<T1, T2, TResult>(
+        string sql,
+        Func<T1, T2, TResult> map,
+        object? param = null)
+    {
+        using (var connection = CreateConnection())
+        {
+            var result = await connection.QueryAsync<T1, T2, TResult>(
+                        sql,
+                        map,
+                        param);
+            return result;
+        }
+
+    }
 }
 

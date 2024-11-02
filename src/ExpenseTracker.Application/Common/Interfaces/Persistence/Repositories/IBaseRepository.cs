@@ -1,3 +1,5 @@
+using ExpenseTracker.Core.Common.Models;
+
 namespace ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 public interface IBaseRepository<T>
     where T : class

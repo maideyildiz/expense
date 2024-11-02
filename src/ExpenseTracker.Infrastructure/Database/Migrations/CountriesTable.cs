@@ -10,6 +10,13 @@ public class CountriesTable : Migration
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
             .WithColumn("Name").AsString().NotNullable()
             .WithColumn("ThreeLetterUAVTCode").AsString().NotNullable();
+
+        Insert.IntoTable("Countries").Row(new
+        {
+            Id = Guid.NewGuid(),
+            Name = "Turkiye",
+            ThreeLetterUAVTCode = "TRY",
+        });
     }
 
     public override void Down()

@@ -1,4 +1,3 @@
-namespace ExpenseTracker.API.Controllers;
 using ErrorOr;
 using MapsterMapper;
 using MediatR;
@@ -8,8 +7,8 @@ using ExpenseTracker.Application.Authentication.Commands.Register;
 using ExpenseTracker.Contracts.Authentication;
 using ExpenseTracker.Application.Authentication.Queries.Login;
 using ExpenseTracker.Application.Authentication.Common;
-using ExpenseTracker.Core.Common.Errors;
-
+using ExpenseTracker.Application.Common.Errors;
+namespace ExpenseTracker.API.Controllers;
 [Route("auth")]
 [AllowAnonymous]
 public class AuthenticationController : ApiController
