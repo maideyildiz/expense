@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Application.Authentication.Commands.Register;
 using ExpenseTracker.Contracts.Authentication;
 using ExpenseTracker.Application.Authentication.Queries.Login;
-using ExpenseTracker.Application.Authentication.Common;
 using ExpenseTracker.Application.Common.Errors;
 namespace ExpenseTracker.API.Controllers;
 [Route("auth")]
@@ -25,17 +24,17 @@ public class AuthenticationController : ApiController
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var command = this._mapper.Map<RegisterCommand>(request);
-        ErrorOr<AuthenticationResult> authResult = await _mediator.Send(command);
+        ErrorOr<string> authResult = await _mediator.Send(command);
 
         return authResult.Match(
-            authResult => Ok(this._mapper.Map<AuthenticationResult>(authResult)),
+            authResult => Ok(this._mapper.Map<string>(authResult)),
             errors => Problem(errors));
     }
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var query = this._mapper.Map<LoginQuery>(request);
-        ErrorOr<AuthenticationResult> authResult = await _mediator.Send(query);
+        ErrorOr<string> authResult = await _mediator.Send(query);
         if (authResult.IsError && authResult.FirstError == Errors.Authentication.InvalidCredentials)
         {
             return Problem(
@@ -44,7 +43,7 @@ public class AuthenticationController : ApiController
         }
 
         return authResult.Match(
-            authResult => Ok(this._mapper.Map<AuthenticationResult>(authResult)),
+            authResult => Ok(this._mapper.Map<string>(authResult)),
             errors => Problem(errors));
     }
 }
