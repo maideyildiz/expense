@@ -1,4 +1,3 @@
-using ExpenseTracker.Application.Authentication.Common;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Application.Common.Interfaces.Services;
@@ -7,6 +6,7 @@ using ExpenseTracker.Application.Authentication.Commands.Register;
 using ExpenseTracker.Core.UserAggregate;
 using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;
+using ExpenseTracker.Application.Authentication.Queries.Login;
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
@@ -19,7 +19,22 @@ public class UserService : IUserService
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
     }
-    public async Task<ErrorOr<AuthenticationResult>> RegisterUserAsync(RegisterCommand command)
+
+    public async Task<ErrorOr<string>> LoginUserAsync(LoginQuery query)
+    {
+        var user = await this._userRepository.GetUserByEmailAsync(query.Email);
+
+        if (user is null || !user.IsActive || !PasswordHasher.VerifyPassword(query.Password, user.PasswordHash))
+        {
+            return Errors.Authentication.InvalidCredentials;
+        }
+
+        var token = this._jwtTokenGenerator.GenerateToken(user);
+
+        return token;
+    }
+
+    public async Task<ErrorOr<string>> RegisterUserAsync(RegisterCommand command)
     {
         var existingUser = await _userRepository.GetUserByEmailAsync(command.Email);
         if (existingUser != null)
@@ -33,7 +48,7 @@ public class UserService : IUserService
 
         var token = _jwtTokenGenerator.GenerateToken(newUser);
 
-        return new AuthenticationResult(token);
+        return token;
     }
 
 }

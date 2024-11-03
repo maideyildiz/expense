@@ -6,44 +6,75 @@ using ExpenseTracker.Infrastructure.Database.Extensions;
 using ExpenseTracker.Infrastructure.Logging;
 
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", builder =>
+    options.AddPolicy("AllowAllOrigins", policyBuilder =>
     {
-        builder.AllowAnyOrigin() // Tüm originlere izin ver
-               .AllowAnyMethod() // Tüm HTTP yöntemlerine izin ver
-               .AllowAnyHeader(); // Tüm başlıklara izin ver
+        policyBuilder.AllowAnyOrigin() // Allow all origins
+                     .AllowAnyMethod() // Allow all HTTP methods
+                     .AllowAnyHeader(); // Allow all headers
     });
 });
-// Bağımlılıkları tek bir yerden yükle
+
+// Register dependencies
 builder.Services.AddPresentation();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-// Swagger/OpenAPI ekle
+
+// Swagger/OpenAPI configuration
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ExpenseTracker API", Version = "v1" });
+
+    // Add JWT authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and then your valid token.",
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer",
+                },
+            },
+            Array.Empty<string>()
+        },
+    });
+});
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+// Run database migrations on startup
 app.MigrateDatabase();
 
-// Geliştirme ortamında Swagger UI kullan
+// Enable Swagger UI in development
 if (app.Environment.IsDevelopment())
 {
-    // Swagger'ı etkinleştir
     app.UseSwagger();
-
-    // Swagger UI'yi etkinleştir
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ExpenseTracker API");
-        c.RoutePrefix = string.Empty; // Swagger'ı kök dizinde göstermek için
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ExpenseTracker API v1");
+        c.RoutePrefix = string.Empty; // Display Swagger UI at the root
     });
 }
+
 app.UseMiddleware<LoggingMiddleware>();
 app.UseCors("AllowAllOrigins");
 app.UseExceptionHandler("/error");

@@ -7,20 +7,21 @@ using System.Security.Claims;
 using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;
 using MediatR;
+using ExpenseTracker.Application.Common.Interfaces.Services;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Commands;
 
 public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand, ErrorOr<int>>
 {
+    private readonly IExpenseService _expenseService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IBaseRepository<Expense> _expenseRepository;
 
     public CreateExpenseCommandHandler(
-        IHttpContextAccessor httpContextAccessor,
-        IBaseRepository<Expense> expenseRepository)
+        IExpenseService expenseService,
+        IHttpContextAccessor httpContextAccessor)
     {
+        _expenseService = expenseService;
         _httpContextAccessor = httpContextAccessor;
-        _expenseRepository = expenseRepository;
     }
 
     public async Task<ErrorOr<int>> Handle(CreateExpenseCommand command, CancellationToken cancellationToken)
@@ -37,16 +38,6 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
             return Errors.Expense.ExpenseCreationFailed;
         }
 
-        Expense expense = Expense.Create(
-            command.Amount,
-            DateTime.UtcNow,
-            DateTime.UtcNow,
-            command.Description,
-            command.CategoryId,
-            userId);
-
-        var result = await _expenseRepository.AddAsync(expense);
-
-        return result > 0 ? result : Errors.Expense.ExpenseCreationFailed;
+        return await _expenseService.AddExpenseAsync(command, userId);
     }
 }

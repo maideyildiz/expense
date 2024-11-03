@@ -1,34 +1,21 @@
-
-
-namespace ExpenseTracker.Application.Authentication.Queries.Login;
 using ErrorOr;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using MediatR;
 using ExpenseTracker.Application.Common.Errors;
-using ExpenseTracker.Application.Authentication.Common;
-public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
+using ExpenseTracker.Application.Common.Interfaces.Services;
+namespace ExpenseTracker.Application.Authentication.Queries.Login;
+public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<string>>
 {
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
 
-    public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
+    public LoginQueryHandler(IUserService userService)
     {
-        this._jwtTokenGenerator = jwtTokenGenerator;
-        this._userRepository = userRepository;
+        _userService = userService;
     }
 
-    public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<string>> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
-        var user = await this._userRepository.GetUserByEmailAsync(query.Email);
-        if (user is null || user.PasswordHash != query.Password || !user.IsActive)
-        {
-            return Errors.Authentication.InvalidCredentials;
-        }
-
-        var token = this._jwtTokenGenerator.GenerateToken(user);
-
-        return new AuthenticationResult(
-            token);
+        return await _userService.LoginUserAsync(query);
     }
 }

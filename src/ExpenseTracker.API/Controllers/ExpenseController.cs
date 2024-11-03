@@ -4,6 +4,7 @@ using ErrorOr;
 using ExpenseTracker.Contracts.ExpenseOperations;
 using MapsterMapper;
 using MediatR;
+using ExpenseTracker.Application.ExpenseOperations.Commands;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -31,13 +32,13 @@ public class ExpenseController : ApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateExpenseRequest request)
+    public async Task<IActionResult> Post([FromBody] CreateExpenseRequest request)
     {
-        var command = _mapper.Map<CreateExpenseRequest>(request);
-        ErrorOr<int> result = (ErrorOr<int>)await _mediator.Send(command);
+        var command = _mapper.Map<CreateExpenseCommand>(request);
+        ErrorOr<int> result = await _mediator.Send(command);
 
         return result.Match(
-            authResult => Ok(_mapper.Map<int>(result)),
+            result => Ok(result),
             errors => Problem(errors));
     }
 
