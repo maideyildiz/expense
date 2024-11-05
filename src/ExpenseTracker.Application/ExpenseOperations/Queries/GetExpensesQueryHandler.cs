@@ -25,21 +25,22 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
 
         public async Task<ErrorOr<PagedResult<GetExpensesQueryResult>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
         {
-
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
             {
                 return Errors.Expense.ExpenseCreationFailed;
             }
-            Guid userId;
-            if (!Guid.TryParse(userIdStr, out userId))
+
+            if (!Guid.TryParse(userIdStr, out Guid userId))
             {
                 return Errors.Expense.ExpenseCreationFailed;
             }
 
-            var expenseResults = await _expenseService.GetExpenseAsync(userId);
-            var totalCount = expenseResults.Count;
-            return new PagedResult<GetExpensesQueryResult>(expenseResults, totalCount, request.Page, request.PageSize);
+            // Call the updated service method with pagination parameters
+            var (items, totalCount) = await _expenseService.GetExpenseAsync(userId, request.Page, request.PageSize);
+
+            return new PagedResult<GetExpensesQueryResult>(items.ToList(), totalCount, request.Page, request.PageSize);
         }
+
     }
 }

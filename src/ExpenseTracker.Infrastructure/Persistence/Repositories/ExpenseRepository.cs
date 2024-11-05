@@ -13,14 +13,24 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         _dbRepository = dbRepository;
     }
 
-    public async Task<IEnumerable<GetExpensesQueryResult>> GetExpenseAsync(Guid userId)
+    public async Task<(IEnumerable<GetExpensesQueryResult> Items, int TotalCount)> GetExpenseAsync(Guid userId, int page, int pageSize)
     {
+        int offset = (page - 1) * pageSize;
+
         string query = @"
         SELECT e.Id, e.Amount, e.CreatedAt, e.Description, c.Name AS CategoryName
         FROM Expenses e
         JOIN Categories c ON e.CategoryId = c.Id
-        WHERE e.UserId = @UserId;";
+        WHERE e.UserId = @UserId
+        LIMIT @PageSize OFFSET @Offset;"; // Use LIMIT and OFFSET
 
-        return await _dbRepository.QueryAsync<GetExpensesQueryResult>(query, new { UserId = userId });
+        var items = await _dbRepository.QueryAsync<GetExpensesQueryResult>(query, new { UserId = userId, PageSize = pageSize, Offset = offset });
+
+        string countQuery = "SELECT COUNT(*) FROM Expenses WHERE UserId = @UserId;";
+        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { UserId = userId });
+
+        return (items, totalCount);
     }
+
+
 }
