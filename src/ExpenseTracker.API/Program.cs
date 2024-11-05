@@ -63,7 +63,12 @@ var app = builder.Build();
 
 // Run database migrations on startup
 app.MigrateDatabase();
-
+app.UseExceptionHandler("/error");
+app.UseCors("AllowAllOrigins");
+app.UseMiddleware<LoggingMiddleware>();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 // Enable Swagger UI in development
 if (app.Environment.IsDevelopment())
 {
@@ -75,12 +80,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseMiddleware<LoggingMiddleware>();
-app.UseCors("AllowAllOrigins");
-app.UseExceptionHandler("/error");
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
