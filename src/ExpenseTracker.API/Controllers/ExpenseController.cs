@@ -5,6 +5,7 @@ using ExpenseTracker.Contracts.ExpenseOperations;
 using MapsterMapper;
 using MediatR;
 using ExpenseTracker.Application.ExpenseOperations.Commands;
+using ExpenseTracker.Application.ExpenseOperations.Queries;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -20,9 +21,14 @@ public class ExpenseController : ApiController
         this._mapper = mapper;
     }
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] GetExpensesRequest request)
     {
-        return Ok();
+        var query = _mapper.Map<GetExpensesQuery>(request);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            result => Ok(result),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
     [HttpGet("{id}")]

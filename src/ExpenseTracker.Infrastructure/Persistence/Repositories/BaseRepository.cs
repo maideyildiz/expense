@@ -18,7 +18,10 @@ public class BaseRepository<T> : IBaseRepository<T>
         string sql = "SELECT * FROM " + typeof(T).Name + "s";
         return await _dbRepository.QueryAsync<T>(sql);
     }
-
+    public async Task<IEnumerable<T>> GetAllByQueryAsync(string query, object? param = null)
+    {
+        return await _dbRepository.QueryAsync<T>(query, param);
+    }
     public async Task<T?> GetByIdAsync(Guid id)
     {
         string sql = $"SELECT * FROM {typeof(T).Name}s WHERE Id = @Id";
