@@ -1,8 +1,9 @@
 namespace ExpenseTracker.Application.ExpenseOperations.Queries;
 
-public record GetExpensesQueryResult(
+public record GetExpenseQueryResult(
     Guid Id,
     decimal Amount,
     DateTime CreatedAt,
     string Description,
-    string CategoryName);
+    string CategoryName,
+    Guid UserId);

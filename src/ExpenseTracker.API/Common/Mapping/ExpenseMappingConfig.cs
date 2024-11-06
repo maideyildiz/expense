@@ -12,8 +12,9 @@ public class ExpenseMappingConfig : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CreateExpenseRequest, CreateExpenseCommand>();
+        config.NewConfig<GetExpenseResponse, GetExpenseQueryResult>();
         config.NewConfig<GetExpensesRequest, GetExpensesQuery>();
-        config.NewConfig<PagedResult<GetExpensesQueryResult>, GetExpensesResponse>()
+        config.NewConfig<PagedResult<GetExpenseQueryResult>, GetExpensesResponse>()
             .Map(dest => dest.Items, src => src.Items.Adapt<List<GetExpenseResponse>>())
             .Map(dest => dest.TotalCount, src => src.TotalCount)
             .Map(dest => dest.Page, src => src.Page)

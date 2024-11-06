@@ -9,5 +9,6 @@ namespace ExpenseTracker.Application.Common.Interfaces.Services;
 public interface IExpenseService
 {
     Task<ErrorOr<int>> AddExpenseAsync(CreateExpenseCommand query, Guid userId);
-    Task<(IEnumerable<GetExpensesQueryResult> Items, int TotalCount)> GetExpenseAsync(Guid userId, int page, int pageSize);
+    Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize);
+    Task<GetExpenseQueryResult?> GetExpenseByIdAsync(Guid userId);
 }
