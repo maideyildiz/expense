@@ -54,9 +54,15 @@ public class ExpenseController : ApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] Guid id)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateExpenseRequest request)
     {
         return Ok();
+        // var command = new UpdateExpenseCommand(id, request.Amount, request.Description, request.CreatedAt, request.CategoryName);
+        // var result = await _mediator.Send(command);
+
+        // return result.Match(
+        //     successResult => Ok(successResult),
+        //     errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 
     [HttpDelete("{id}")]
