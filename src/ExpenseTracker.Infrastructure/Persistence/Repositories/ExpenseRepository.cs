@@ -41,4 +41,14 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         WHERE e.Id = @Id;";
         return await _dbRepository.QueryFirstOrDefaultAsync<GetExpenseQueryResult>(query, new { Id = id });
     }
+
+    public async Task<Expense> UpdateExpenseAsync(Expense expense)
+    {
+        string query = @"
+        UPDATE Expenses
+        SET Amount = @Amount, Description = @Description, CategoryId = @CategoryId, UpdatedAt = @UpdatedAt
+        WHERE Id = @Id;";
+        await _dbRepository.ExecuteAsync(query, expense);
+        return expense;
+    }
 }
