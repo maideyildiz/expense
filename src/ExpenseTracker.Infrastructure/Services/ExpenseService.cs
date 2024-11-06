@@ -28,7 +28,12 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.AddAsync(expense);
     }
 
-    public async Task<(IEnumerable<GetExpensesQueryResult> Items, int TotalCount)> GetExpenseAsync(Guid userId, int page, int pageSize)
+    public async Task<GetExpenseQueryResult?> GetExpenseByIdAsync(Guid id)
+    {
+        return await _expenseRepository.GetExpenseByIdAsync(id);
+    }
+
+    public async Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
     {
         var (items, totalCount) = await _expenseRepository.GetExpenseAsync(userId, page, pageSize);
 

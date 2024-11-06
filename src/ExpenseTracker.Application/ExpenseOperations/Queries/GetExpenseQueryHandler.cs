@@ -12,18 +12,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Queries
 {
-    public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, ErrorOr<PagedResult<GetExpenseQueryResult>>>
+    public class GetExpenseQueryHandler : IRequestHandler<GetExpenseQuery, ErrorOr<GetExpenseQueryResult>>
     {
         private readonly IExpenseService _expenseService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GetExpensesQueryHandler(IExpenseService expenseService, IHttpContextAccessor httpContextAccessor)
+        public GetExpenseQueryHandler(IExpenseService expenseService, IHttpContextAccessor httpContextAccessor)
         {
             _expenseService = expenseService;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ErrorOr<PagedResult<GetExpenseQueryResult>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<GetExpenseQueryResult>> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
         {
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -36,11 +36,17 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
                 return Errors.Expense.ExpenseCreationFailed;
             }
 
-            // Call the updated service method with pagination parameters
-            var (items, totalCount) = await _expenseService.GetExpensesAsync(userId, request.Page, request.PageSize);
+            var result = await _expenseService.GetExpenseByIdAsync(request.Id);
+            if (result == null)
+            {
+                return Errors.Expense.ExpenseNotFound;
+            }
+            if (result.UserId != userId)
+            {
+                return Errors.Expense.ExpenseNotFound;
+            }
 
-            return new PagedResult<GetExpenseQueryResult>(items.ToList(), totalCount, request.Page, request.PageSize);
+            return result;
         }
-
     }
 }

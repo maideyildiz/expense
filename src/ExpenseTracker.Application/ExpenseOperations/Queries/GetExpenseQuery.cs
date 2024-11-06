@@ -5,5 +5,5 @@ using ExpenseTracker.Application.Common.Models;
 using MediatR;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Queries;
-public record GetExpensesQuery(int Page, int PageSize) : IRequest<ErrorOr<PagedResult<GetExpenseQueryResult>>>;
+public record GetExpenseQuery(Guid Id) : IRequest<ErrorOr<GetExpenseQueryResult>>;
 

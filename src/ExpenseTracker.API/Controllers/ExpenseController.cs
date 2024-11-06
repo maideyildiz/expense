@@ -32,9 +32,14 @@ public class ExpenseController : ApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        return Ok();
+        var query = new GetExpenseQuery(id);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            result => Ok(result),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
     [HttpPost]
@@ -49,7 +54,7 @@ public class ExpenseController : ApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update()
+    public async Task<IActionResult> Update([FromRoute] Guid id)
     {
         return Ok();
     }
