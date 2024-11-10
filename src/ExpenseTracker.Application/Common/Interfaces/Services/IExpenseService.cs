@@ -12,4 +12,5 @@ public interface IExpenseService
     Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize);
     Task<ErrorOr<ExpenseResult?>> GetExpenseByIdAsync(Guid userId);
     Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query);
+    Task<int> DeleteExpenseAsync(Guid id);
 }

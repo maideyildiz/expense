@@ -65,8 +65,13 @@ public class ExpenseController : ApiController
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        return Ok();
+        var command = new DeleteExpenseCommand(id);
+        var result = await _mediator.Send(command);
+
+        return result.Match(
+            successResult => Ok(successResult),
+            errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 }

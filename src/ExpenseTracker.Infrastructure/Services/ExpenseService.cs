@@ -26,6 +26,11 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.AddAsync(expense);
     }
 
+    public async Task<int> DeleteExpenseAsync(Guid id)
+    {
+        return await _expenseRepository.DeleteAsync(id);
+    }
+
     public async Task<ErrorOr<ExpenseResult?>> GetExpenseByIdAsync(Guid id)
     {
         var expense = await _expenseRepository.GetExpenseByIdAsync(id);
