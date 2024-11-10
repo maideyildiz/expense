@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ErrorOr;
-using ExpenseTracker.Application.InvestmentOperations.Commands;
 using ExpenseTracker.Contracts.InvestmentOperations;
 using MapsterMapper;
 using MediatR;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 namespace ExpenseTracker.API.Controllers;
 [Route("investment")]
 public class InvestmentController : ApiController

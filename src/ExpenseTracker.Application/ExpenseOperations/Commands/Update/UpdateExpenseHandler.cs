@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Update;
 
 
 public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorOr<ExpenseResult>>
@@ -36,7 +36,11 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
         {
             return Errors.Expense.ExpenseCreationFailed;
         }
-
+        var check = await _expenseService.CheckIfUserOwnsExpense(command.Id, userId);
+        if (!check)
+        {
+            return Errors.Expense.ExpenseNotFound;
+        }
         return await _expenseService.UpdateExpenseAsync(command);
     }
 }

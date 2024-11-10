@@ -1,4 +1,4 @@
-using ExpenseTracker.Application.InvestmentOperations.Commands;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 using ExpenseTracker.Contracts.InvestmentOperations;
 
 using Mapster;

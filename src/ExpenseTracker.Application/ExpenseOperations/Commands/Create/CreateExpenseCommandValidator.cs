@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
 public class CreateExpenseCommandValidator : AbstractValidator<CreateExpenseCommand>
 {

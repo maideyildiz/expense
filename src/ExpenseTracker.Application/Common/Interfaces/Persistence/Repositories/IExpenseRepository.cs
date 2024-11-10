@@ -7,4 +7,5 @@ public interface IExpenseRepository : IBaseRepository<Expense>
 {
     Task<ExpenseResult> GetExpenseByIdAsync(Guid id);
     Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize);
+    Task<Guid> GetExpenseUserIdAsync(Guid expenseId);
 }

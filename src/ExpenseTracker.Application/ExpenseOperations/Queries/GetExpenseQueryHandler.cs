@@ -24,7 +24,7 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ErrorOr<ExpenseResult>> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<ExpenseResult>> Handle(GetExpenseQuery query, CancellationToken cancellationToken)
         {
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -36,8 +36,12 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             {
                 return Errors.Expense.ExpenseCreationFailed;
             }
-
-            var result = await _expenseService.GetExpenseByIdAsync(request.Id);
+            var check = await _expenseService.CheckIfUserOwnsExpense(query.Id, userId);
+            if (!check)
+            {
+                return Errors.Expense.ExpenseNotFound;
+            }
+            var result = await _expenseService.GetExpenseByIdAsync(query.Id);
             return result;
         }
     }

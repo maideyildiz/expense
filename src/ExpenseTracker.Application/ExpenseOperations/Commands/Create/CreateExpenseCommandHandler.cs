@@ -6,10 +6,11 @@ using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;
 using MediatR;
 using ExpenseTracker.Application.Common.Interfaces.Services;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
-public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand, ErrorOr<int>>
+public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand, ErrorOr<ExpenseResult>>
 {
     private readonly IExpenseService _expenseService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -22,7 +23,7 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ErrorOr<int>> Handle(CreateExpenseCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<ExpenseResult>> Handle(CreateExpenseCommand command, CancellationToken cancellationToken)
     {
         string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -35,7 +36,11 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
         {
             return Errors.Expense.ExpenseCreationFailed;
         }
-
-        return await _expenseService.AddExpenseAsync(command, userId);
+        var result = await _expenseService.AddExpenseAsync(command, userId);
+        if (result.IsError)
+        {
+            return Errors.Expense.ExpenseCreationFailed;
+        }
+        return await _expenseService.GetExpenseByIdAsync(result.Value);
     }
 }
