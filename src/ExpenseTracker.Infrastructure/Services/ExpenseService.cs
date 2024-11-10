@@ -1,11 +1,12 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Services;
-using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
 using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Core.Entities;
 using ErrorOr;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Create;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Update;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
@@ -35,9 +36,22 @@ public class ExpenseService : IExpenseService
         }
     }
 
-    public async Task<int> DeleteExpenseAsync(Guid id)
+    public async Task<ErrorOr<bool>> DeleteExpenseAsync(Guid id)
     {
-        return await _expenseRepository.DeleteAsync(id);
+        Expense expense = await _expenseRepository.GetByIdAsync(id);
+        if (expense == null)
+        {
+            return Errors.Expense.ExpenseNotFound;
+        }
+        var result = await _expenseRepository.DeleteAsync(id);
+        if (result <= 0)
+        {
+            return Errors.Expense.ExpenseDeletionFailed;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public async Task<ErrorOr<ExpenseResult>> GetExpenseByIdAsync(Guid id)

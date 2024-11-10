@@ -8,7 +8,7 @@ using MediatR;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
 public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand, ErrorOr<ExpenseResult>>
 {

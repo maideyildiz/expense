@@ -10,9 +10,9 @@ using MediatR;
 
 using Microsoft.AspNetCore.Http;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Delete;
 
-public class DeleteExpenseCommandHandler : IRequestHandler<DeleteExpenseCommand, ErrorOr<int>>
+public class DeleteExpenseCommandHandler : IRequestHandler<DeleteExpenseCommand, ErrorOr<bool>>
 {
     private readonly IExpenseService _expenseService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -21,7 +21,7 @@ public class DeleteExpenseCommandHandler : IRequestHandler<DeleteExpenseCommand,
         _expenseService = expenseService;
         _httpContextAccessor = httpContextAccessor;
     }
-    public async Task<ErrorOr<int>> Handle(DeleteExpenseCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<bool>> Handle(DeleteExpenseCommand command, CancellationToken cancellationToken)
     {
         var userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))

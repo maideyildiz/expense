@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands;
+namespace ExpenseTracker.Application.ExpenseOperations.Commands.Update;
 
 
 public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorOr<ExpenseResult>>

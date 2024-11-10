@@ -6,6 +6,7 @@ using MapsterMapper;
 using MediatR;
 using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
 namespace ExpenseTracker.API.Controllers;
 
