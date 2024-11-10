@@ -15,6 +15,19 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         _dbRepository = dbRepository;
     }
 
+    public async Task<ExpenseResult> GetExpenseByIdAsync(Guid id)
+    {
+        var query = @"
+        SELECT e.Id, e.Amount, e.CreatedAt, e.Description, c.CategoryName
+        FROM Expenses e
+        LEFT JOIN Categories c ON e.CategoryId = c.Id
+        WHERE e.Id = @Id";
+
+        var expense = await _dbRepository.QuerySingleOrDefaultAsync<ExpenseResult>(query, new { Id = id });
+
+        return expense;
+    }
+
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize)
     {
         string query = @"
@@ -32,29 +45,5 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { UserId = userId });
 
         return (expenses, totalCount);
-    }
-
-    public async Task<ExpenseResult> UpdateExpensesByUserIdAsync(Expense expense)
-    {
-        string query = @"
-        UPDATE Expenses
-        SET Amount = @Amount, Description = @Description, CategoryId = @CategoryId, UpdatedAt = NOW()
-        WHERE Id = @Id AND UserId = @UserId";
-
-        int rowsAffected = await _dbRepository.ExecuteAsync(query, new
-        {
-            Id = expense.Id,
-            UserId = expense.UserId,
-            Amount = expense.Amount,
-            Description = expense.Description,
-            CategoryId = expense.CategoryId,
-        });
-
-        if (rowsAffected == 0)
-        {
-            return null;
-        }
-
-        return null;
     }
 }

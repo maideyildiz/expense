@@ -28,13 +28,12 @@ public class ExpenseService : IExpenseService
 
     public async Task<ErrorOr<ExpenseResult?>> GetExpenseByIdAsync(Guid id)
     {
-        Expense? expense = await _expenseRepository.GetByIdAsync(id);
+        var expense = await _expenseRepository.GetExpenseByIdAsync(id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
-        ExpenseResult getExpenseQueryResult = new ExpenseResult(expense.Id, expense.Amount, expense.Description, expense.UpdatedAt, "");
-        return getExpenseQueryResult;
+        return expense;
     }
 
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
@@ -52,8 +51,7 @@ public class ExpenseService : IExpenseService
         expense.Update(query.Amount, query.Description, query.CategoryId);
         if (await _expenseRepository.UpdateAsync(expense) > 0)
         {
-            ExpenseResult updateExpenseResult = new ExpenseResult(expense.Id, expense.Amount, expense.Description, expense.UpdatedAt, "");
-            return updateExpenseResult;
+            return await GetExpenseByIdAsync(expense.Id);
         }
         else
         {
