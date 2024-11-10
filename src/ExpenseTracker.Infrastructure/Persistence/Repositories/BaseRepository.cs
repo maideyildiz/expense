@@ -1,10 +1,11 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
-using ExpenseTracker.Core.Common.Models;
+using ExpenseTracker.Core.Common.Base;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T>
-    where T : class
+    where T : EntityBase<Guid>
 {
     private readonly IDbRepository _dbRepository;
 
@@ -30,11 +31,22 @@ public class BaseRepository<T> : IBaseRepository<T>
 
     public async Task<int> AddAsync(T obj)
     {
-        string insertClause = string.Join(", ", typeof(T).GetProperties().Select(p => p.Name));
-        string valuesClause = string.Join(", ", typeof(T).GetProperties().Select(p => "@" + p.Name));
+        var propertiesToInsert = typeof(T)
+            .GetProperties()
+            .Where(p => !IsCollectionProperty(p))
+            .Select(p => p.Name);
+
+        string insertClause = string.Join(", ", propertiesToInsert);
+        string valuesClause = string.Join(", ", propertiesToInsert.Select(p => "@" + p));
 
         string sql = $"INSERT INTO {typeof(T).Name}s ({insertClause}) VALUES ({valuesClause})";
         return await _dbRepository.ExecuteAsync(sql, obj);
+    }
+
+    private bool IsCollectionProperty(System.Reflection.PropertyInfo property)
+    {
+        return typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType) &&
+               property.PropertyType != typeof(string);
     }
 
     public async Task<int> UpdateAsync(T obj)
@@ -47,5 +59,10 @@ public class BaseRepository<T> : IBaseRepository<T>
     {
         string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";
         return await _dbRepository.ExecuteAsync(sql, new { Id = id });
+    }
+
+    public async Task<T?> GetByQueryAsync(string query, object? param = null)
+    {
+        return await _dbRepository.QueryFirstOrDefaultAsync<T>(query, param);
     }
 }

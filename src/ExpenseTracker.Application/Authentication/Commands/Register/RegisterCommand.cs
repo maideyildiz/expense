@@ -8,6 +8,5 @@ public record RegisterCommand(
     string LastName,
     string Email,
     string Password,
-    Guid CityId,
-    Guid SubscriptionId)
+    Guid CityId)
     : IRequest<ErrorOr<string>>;

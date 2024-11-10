@@ -5,6 +5,7 @@ using ErrorOr;
 using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.Common.Models;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
 using MediatR;
 
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Queries
 {
-    public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, ErrorOr<PagedResult<GetExpenseQueryResult>>>
+    public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, ErrorOr<PagedResult<ExpenseResult>>>
     {
         private readonly IExpenseService _expenseService;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +24,7 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ErrorOr<PagedResult<GetExpenseQueryResult>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<PagedResult<ExpenseResult>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
         {
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -36,10 +37,9 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
                 return Errors.Expense.ExpenseCreationFailed;
             }
 
-            // Call the updated service method with pagination parameters
             var (items, totalCount) = await _expenseService.GetExpensesAsync(userId, request.Page, request.PageSize);
 
-            return new PagedResult<GetExpenseQueryResult>(items.ToList(), totalCount, request.Page, request.PageSize);
+            return new PagedResult<ExpenseResult>(items.ToList(), totalCount, request.Page, request.PageSize);
         }
 
     }

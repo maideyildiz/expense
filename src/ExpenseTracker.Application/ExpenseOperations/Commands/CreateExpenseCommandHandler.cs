@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
-using ExpenseTracker.Core.ExpenseAggregate;
-using ExpenseTracker.Core.UserAggregate;
-using ExpenseTracker.Core.Common.Entities;
+using ExpenseTracker.Core.Entities;
 using System.Security.Claims;
 using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;

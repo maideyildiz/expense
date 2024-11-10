@@ -5,6 +5,7 @@ using ErrorOr;
 using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.Common.Models;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
 using MediatR;
 
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Queries
 {
-    public class GetExpenseQueryHandler : IRequestHandler<GetExpenseQuery, ErrorOr<GetExpenseQueryResult>>
+    public class GetExpenseQueryHandler : IRequestHandler<GetExpenseQuery, ErrorOr<ExpenseResult>>
     {
         private readonly IExpenseService _expenseService;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +24,7 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ErrorOr<GetExpenseQueryResult>> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<ExpenseResult>> Handle(GetExpenseQuery request, CancellationToken cancellationToken)
         {
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -37,15 +38,6 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             }
 
             var result = await _expenseService.GetExpenseByIdAsync(request.Id);
-            if (result == null)
-            {
-                return Errors.Expense.ExpenseNotFound;
-            }
-            if (result.UserId != userId)
-            {
-                return Errors.Expense.ExpenseNotFound;
-            }
-
             return result;
         }
     }

@@ -1,16 +1,15 @@
-using ExpenseTracker.Core.Common.Models;
+using ExpenseTracker.Core.Common.Base;
 
-namespace ExpenseTracker.Core.Common.Entities;
+namespace ExpenseTracker.Core.Entities;
 
-public class Country : Entity<Guid>
+public class Country : Entity
 {
-    private readonly List<Guid> _cityIds = new();
     public string Name { get; private set; }
     public string ThreeLetterUAVTCode { get; private set; }
-    public IReadOnlyList<Guid> CityIds => this._cityIds.AsReadOnly();
+    public IReadOnlyList<City> Cities { get; private set; }
     private Country(Guid id, string name, string threeLetterUAVTCode)
-        : base(id)
     {
+        Id = id;
         Name = name;
         ThreeLetterUAVTCode = threeLetterUAVTCode;
     }

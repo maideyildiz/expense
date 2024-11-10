@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Services;
-using ExpenseTracker.Core.UserAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Authentication;
 
@@ -28,7 +28,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //new Claim(ClaimTypes.Role, user.SubscriptionId.ToString()!), // Add user roles if necessary
         };
 
         var tokenDescriptor = new JwtSecurityToken(

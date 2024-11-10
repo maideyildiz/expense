@@ -20,12 +20,7 @@ public class UsersTable : Migration
             .WithColumn("UpdatedAt").AsDateTime().NotNullable()
             .WithColumn("LastLoginAt").AsDateTime().Nullable()
             .WithColumn("IsActive").AsBoolean().NotNullable()
-            .WithColumn("SubscriptionId").AsGuid().NotNullable()
             .WithColumn("CityId").AsGuid().NotNullable();
-
-        Create.ForeignKey("FK_Users_Subscriptions")
-        .FromTable("Users").ForeignColumn("SubscriptionId")
-        .ToTable("Subscriptions").PrimaryColumn("Id");
 
         Create.ForeignKey("FK_Users_Cities")
         .FromTable("Users").ForeignColumn("CityId")
@@ -34,7 +29,6 @@ public class UsersTable : Migration
 
     public override void Down()
     {
-        Delete.ForeignKey("FK_Users_Subscriptions").OnTable("Users");
         Delete.ForeignKey("FK_Users_Cities").OnTable("Users");
         Delete.Table("Users");
     }
