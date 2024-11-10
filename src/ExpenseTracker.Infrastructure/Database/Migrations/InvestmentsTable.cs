@@ -21,7 +21,7 @@ public class InvestmentsTable : Migration
 
         Create.ForeignKey("FK_Investments_Categories")
             .FromTable("Investments").ForeignColumn("CategoryId")
-            .ToTable("Categories").PrimaryColumn("Id");
+            .ToTable("InvestmentCategories").PrimaryColumn("Id");
     }
 
     public override void Down()

@@ -4,6 +4,7 @@ namespace ExpenseTracker.Core.Entities;
 
 public class InvestmentCategory : Category
 {
+    public IReadOnlyList<Investment> Investments { get; private set; }
     private InvestmentCategory(Guid id, string name, string description)
         : base(id, name, description)
     {

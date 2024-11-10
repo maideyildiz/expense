@@ -17,7 +17,7 @@ public class ExpensesTable : Migration
 
         Create.ForeignKey("FK_Expenses_Categories")
             .FromTable("Expenses").ForeignColumn("CategoryId")
-            .ToTable("Categories").PrimaryColumn("Id");
+            .ToTable("ExpenseCategories").PrimaryColumn("Id");
 
         Create.ForeignKey("FK_Expenses_Users")
             .FromTable("Expenses").ForeignColumn("UserId")
