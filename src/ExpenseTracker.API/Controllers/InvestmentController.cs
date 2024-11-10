@@ -1,3 +1,12 @@
+using ErrorOr;
+
+using ExpenseTracker.Application.InvestmentOperations.Commands;
+using ExpenseTracker.Contracts.InvestmentOperations;
+
+using MapsterMapper;
+
+using MediatR;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +15,16 @@ namespace ExpenseTracker.API.Controllers;
 [Route("investment")]
 public class InvestmentController : ApiController
 {
+    private readonly ISender _mediator;
+    private readonly IMapper _mapper;
+
+    public InvestmentController(ISender mediator, IMapper mapper)
+    {
+        _mediator = mediator;
+        _mapper = mapper;
+    }
+
+
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -19,9 +38,14 @@ public class InvestmentController : ApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post()
+    public async Task<IActionResult> Post([FromBody] CreateInvestmentRequest request)
     {
-        return Ok();
+        var command = _mapper.Map<CreateInvestmentCommand>(request);
+        ErrorOr<int> result = await _mediator.Send(command);
+
+        return result.Match(
+            result => Ok(result),
+            errors => Problem(errors));
     }
 
     [HttpPut("{id}")]
