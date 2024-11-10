@@ -6,11 +6,12 @@ using System.Security.Claims;
 using ExpenseTracker.Application.Common.Errors;
 using Microsoft.AspNetCore.Http;
 using ExpenseTracker.Application.Common.Interfaces.Services;
+using ExpenseTracker.Application.InvestmentOperations.Common;
 
 namespace ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 
 
-public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCommand, ErrorOr<int>>
+public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCommand, ErrorOr<InvestmentResult>>
 {
     private readonly IInvestmentService _investmentService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -19,7 +20,7 @@ public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCo
         _httpContextAccessor = httpContextAccessor;
         _investmentService = investmentService;
     }
-    public async Task<ErrorOr<int>> Handle(CreateInvestmentCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<InvestmentResult>> Handle(CreateInvestmentCommand request, CancellationToken cancellationToken)
     {
         string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

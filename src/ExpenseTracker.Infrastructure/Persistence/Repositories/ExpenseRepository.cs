@@ -10,7 +10,8 @@ namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
 public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
 {
     private readonly IDbRepository _dbRepository;
-    public ExpenseRepository(IDbRepository dbRepository) : base(dbRepository)
+    public ExpenseRepository(IDbRepository dbRepository)
+    : base(dbRepository)
     {
         _dbRepository = dbRepository;
     }
