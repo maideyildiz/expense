@@ -7,11 +7,12 @@ using MediatR;
 
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Commands;
 
 
-public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorOr<UpdateExpenseResult>>
+public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorOr<ExpenseResult>>
 {
     private readonly IExpenseService _expenseService;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -23,7 +24,7 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ErrorOr<UpdateExpenseResult>> Handle(UpdateExpenseCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<ExpenseResult>> Handle(UpdateExpenseCommand command, CancellationToken cancellationToken)
     {
         string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -36,7 +37,6 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
             return Errors.Expense.ExpenseCreationFailed;
         }
 
-
-        throw new NotImplementedException();
+        return await _expenseService.UpdateExpenseAsync(command);
     }
 }

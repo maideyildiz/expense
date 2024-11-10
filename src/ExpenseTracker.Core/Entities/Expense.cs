@@ -35,4 +35,15 @@ public class Expense : Entity
             categoryId,
             userId);
     }
+
+    public void Update(
+        decimal amount,
+        string description,
+        Guid categoryId)
+    {
+        Amount = amount;
+        Description = description;
+        CategoryId = categoryId;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

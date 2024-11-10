@@ -5,13 +5,14 @@ using ExpenseTracker.Application.ExpenseOperations.Queries;
 using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Core.Entities;
 using ErrorOr;
+using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class ExpenseService : IExpenseService
 {
-    private readonly IBaseRepository<Expense> _expenseRepository;
-    public ExpenseService(IBaseRepository<Expense> expenseRepository)
+    private readonly IExpenseRepository _expenseRepository;
+    public ExpenseService(IExpenseRepository expenseRepository)
     {
         _expenseRepository = expenseRepository;
     }
@@ -25,46 +26,38 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.AddAsync(expense);
     }
 
-    public async Task<ErrorOr<GetExpenseQueryResult?>> GetExpenseByIdAsync(Guid id)
+    public async Task<ErrorOr<ExpenseResult?>> GetExpenseByIdAsync(Guid id)
     {
         Expense? expense = await _expenseRepository.GetByIdAsync(id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
-        GetExpenseQueryResult getExpenseQueryResult = new GetExpenseQueryResult(expense.Id, expense.Amount, expense.CreatedAt, expense.Description, "");
+        ExpenseResult getExpenseQueryResult = new ExpenseResult(expense.Id, expense.Amount, expense.Description, expense.UpdatedAt, "");
         return getExpenseQueryResult;
     }
 
-    public Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
+    public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
     {
-        throw new NotImplementedException();
+        return await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
     }
 
-    // public async Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
-    // {
-    //     var (items, totalCount) = await _expenseRepository.GetExpenseAsync(userId, page, pageSize);
-
-    //     return (items, totalCount);
-    // }
-
-    public async Task<ErrorOr<UpdateExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query)
+    public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query)
     {
         Expense? expense = await _expenseRepository.GetByIdAsync(query.Id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
+        expense.Update(query.Amount, query.Description, query.CategoryId);
         if (await _expenseRepository.UpdateAsync(expense) > 0)
         {
-            UpdateExpenseResult updateExpenseResult = new UpdateExpenseResult(expense.Amount, expense.Description, expense.UpdatedAt, query.Description);
+            ExpenseResult updateExpenseResult = new ExpenseResult(expense.Id, expense.Amount, expense.Description, expense.UpdatedAt, "");
             return updateExpenseResult;
         }
         else
         {
             return Errors.Expense.ExpenseUpdateFailed;
         }
-
-
     }
 }
