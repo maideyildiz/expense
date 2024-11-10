@@ -37,15 +37,6 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             }
 
             var result = await _expenseService.GetExpenseByIdAsync(request.Id);
-            if (result == null)
-            {
-                return Errors.Expense.ExpenseNotFound;
-            }
-            if (result.UserId != userId)
-            {
-                return Errors.Expense.ExpenseNotFound;
-            }
-
             return result;
         }
     }

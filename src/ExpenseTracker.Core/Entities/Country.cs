@@ -4,13 +4,9 @@ namespace ExpenseTracker.Core.Entities;
 
 public class Country : Entity
 {
-    public Country()
-    {
-        Cities = new HashSet<City>();
-    }
     public string Name { get; private set; }
     public string ThreeLetterUAVTCode { get; private set; }
-    public ICollection<City> Cities { get; private set; }
+    public IReadOnlyList<City> Cities { get; private set; }
     private Country(Guid id, string name, string threeLetterUAVTCode)
     {
         Name = name;
