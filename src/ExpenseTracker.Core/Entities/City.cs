@@ -9,6 +9,7 @@ public class City : Entity
 
     private City(Guid id, string name, Guid countryId, string threeLetterUAVTCode)
     {
+        Id = id;
         Name = name;
         CountryId = countryId;
         ThreeLetterUAVTCode = threeLetterUAVTCode;

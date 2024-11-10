@@ -15,6 +15,7 @@ public class Expense : Entity
         Guid categoryId,
         Guid userId)
     {
+        Id = id;
         Amount = amount;
         Description = description;
         CategoryId = categoryId;

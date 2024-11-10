@@ -9,6 +9,7 @@ public class Country : Entity
     public IReadOnlyList<City> Cities { get; private set; }
     private Country(Guid id, string name, string threeLetterUAVTCode)
     {
+        Id = id;
         Name = name;
         ThreeLetterUAVTCode = threeLetterUAVTCode;
     }

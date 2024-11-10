@@ -16,6 +16,7 @@ public class Investment : Entity
         Guid userId,
         Guid categoryId)
     {
+        Id = id;
         Amount = amount;
         Description = description;
         CategoryId = categoryId;
