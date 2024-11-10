@@ -17,7 +17,7 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
     public async Task<ExpenseResult> GetExpenseByIdAsync(Guid id)
     {
         var query = @"
-            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName
+            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
             FROM Expenses e
             LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
             WHERE e.Id = @Id";
@@ -30,7 +30,7 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize)
     {
         string query = @"
-        SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName
+        SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
         FROM Expenses e
         LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
         WHERE e.UserId = @UserId
@@ -44,5 +44,11 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { UserId = userId });
 
         return (expenses, totalCount);
+    }
+
+    public async Task<Guid> GetExpenseUserIdAsync(Guid expenseId)
+    {
+        var query = "SELECT UserId FROM Expenses WHERE Id = @ExpenseId";
+        return await _dbRepository.QuerySingleOrDefaultAsync<Guid>(query, new { ExpenseId = expenseId });
     }
 }

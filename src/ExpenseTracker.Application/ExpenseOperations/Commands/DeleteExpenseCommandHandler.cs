@@ -21,7 +21,7 @@ public class DeleteExpenseCommandHandler : IRequestHandler<DeleteExpenseCommand,
         _expenseService = expenseService;
         _httpContextAccessor = httpContextAccessor;
     }
-    public async Task<ErrorOr<int>> Handle(DeleteExpenseCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<int>> Handle(DeleteExpenseCommand command, CancellationToken cancellationToken)
     {
         var userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -33,14 +33,12 @@ public class DeleteExpenseCommandHandler : IRequestHandler<DeleteExpenseCommand,
         {
             return Errors.Expense.ExpenseUpdateFailed;
         }
-        var expense = await _expenseService.GetExpenseByIdAsync(request.Id);
-        if (expense.IsError)
+        var check = await _expenseService.CheckIfUserOwnsExpense(command.Id, userId);
+        if (!check)
         {
             return Errors.Expense.ExpenseNotFound;
         }
 
-        return await _expenseService.DeleteExpenseAsync(request.Id);
-
-        throw new NotImplementedException();
+        return await _expenseService.DeleteExpenseAsync(command.Id);
     }
 }

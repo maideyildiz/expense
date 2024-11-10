@@ -24,7 +24,7 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ErrorOr<PagedResult<ExpenseResult>>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<PagedResult<ExpenseResult>>> Handle(GetExpensesQuery query, CancellationToken cancellationToken)
         {
             string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
@@ -36,10 +36,9 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             {
                 return Errors.Expense.ExpenseCreationFailed;
             }
+            var (items, totalCount) = await _expenseService.GetExpensesAsync(userId, query.Page, query.PageSize);
 
-            var (items, totalCount) = await _expenseService.GetExpensesAsync(userId, request.Page, request.PageSize);
-
-            return new PagedResult<ExpenseResult>(items.ToList(), totalCount, request.Page, request.PageSize);
+            return new PagedResult<ExpenseResult>(items.ToList(), totalCount, query.Page, query.PageSize);
         }
 
     }

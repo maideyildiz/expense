@@ -36,7 +36,11 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ErrorO
         {
             return Errors.Expense.ExpenseCreationFailed;
         }
-
+        var check = await _expenseService.CheckIfUserOwnsExpense(command.Id, userId);
+        if (!check)
+        {
+            return Errors.Expense.ExpenseNotFound;
+        }
         return await _expenseService.UpdateExpenseAsync(command);
     }
 }

@@ -46,7 +46,7 @@ public class ExpenseController : ApiController
     public async Task<IActionResult> Post([FromBody] CreateExpenseRequest request)
     {
         var command = _mapper.Map<CreateExpenseCommand>(request);
-        ErrorOr<int> result = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
         return result.Match(
             result => Ok(result),

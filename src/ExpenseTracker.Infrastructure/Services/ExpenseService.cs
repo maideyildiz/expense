@@ -16,14 +16,23 @@ public class ExpenseService : IExpenseService
     {
         _expenseRepository = expenseRepository;
     }
-    public async Task<ErrorOr<int>> AddExpenseAsync(CreateExpenseCommand command, Guid userId)
+    public async Task<ErrorOr<Guid>> AddExpenseAsync(CreateExpenseCommand command, Guid userId)
     {
         Expense expense = Expense.Create(
             command.Amount,
             command.Description,
             command.CategoryId,
             userId);
-        return await _expenseRepository.AddAsync(expense);
+
+        var result = await _expenseRepository.AddAsync(expense);
+        if (result <= 0)
+        {
+            return Errors.Expense.ExpenseCreationFailed;
+        }
+        else
+        {
+            return expense.Id;
+        }
     }
 
     public async Task<int> DeleteExpenseAsync(Guid id)
@@ -31,7 +40,7 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.DeleteAsync(id);
     }
 
-    public async Task<ErrorOr<ExpenseResult?>> GetExpenseByIdAsync(Guid id)
+    public async Task<ErrorOr<ExpenseResult>> GetExpenseByIdAsync(Guid id)
     {
         var expense = await _expenseRepository.GetExpenseByIdAsync(id);
         if (expense == null)
@@ -48,7 +57,7 @@ public class ExpenseService : IExpenseService
 
     public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand command)
     {
-        Expense? expense = await _expenseRepository.GetByIdAsync(command.Id);
+        Expense expense = await _expenseRepository.GetByIdAsync(command.Id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
@@ -61,6 +70,19 @@ public class ExpenseService : IExpenseService
         else
         {
             return Errors.Expense.ExpenseUpdateFailed;
+        }
+    }
+
+    public async Task<bool> CheckIfUserOwnsExpense(Guid userId, Guid expenseId)
+    {
+        Guid expenseUserId = await _expenseRepository.GetExpenseUserIdAsync(expenseId);
+        if (expenseUserId == Guid.Empty || expenseUserId != userId)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 }

@@ -5,4 +5,5 @@ public record ExpenseResult(
     decimal Amount,
     string Description,
     DateTime UpdatedAt,
-    string CategoryName);
+    string CategoryName,
+    Guid UserId);

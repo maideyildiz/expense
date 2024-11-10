@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IExpenseService, ExpenseService>();
+        services.AddScoped<IInvestmentService, InvestmentService>();
         services.AddAuth(configuration);
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         return services;
