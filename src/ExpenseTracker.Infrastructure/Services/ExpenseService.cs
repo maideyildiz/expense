@@ -1,4 +1,5 @@
 
+
 using ErrorOr;
 
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
@@ -11,8 +12,8 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class ExpenseService : IExpenseService
 {
-    private readonly IExpenseRepository _expenseRepository;
-    public ExpenseService(IExpenseRepository expenseRepository)
+    private readonly IBaseRepository<Expense> _expenseRepository;
+    public ExpenseService(IBaseRepository<Expense> expenseRepository)
     {
         _expenseRepository = expenseRepository;
     }
@@ -28,15 +29,20 @@ public class ExpenseService : IExpenseService
 
     public async Task<GetExpenseQueryResult?> GetExpenseByIdAsync(Guid id)
     {
-        return await _expenseRepository.GetExpenseByIdAsync(id);
+        throw new NotImplementedException();
     }
 
-    public async Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
+    public Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
     {
-        var (items, totalCount) = await _expenseRepository.GetExpenseAsync(userId, page, pageSize);
-
-        return (items, totalCount);
+        throw new NotImplementedException();
     }
+
+    // public async Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
+    // {
+    //     var (items, totalCount) = await _expenseRepository.GetExpenseAsync(userId, page, pageSize);
+
+    //     return (items, totalCount);
+    // }
 
     public Task<UpdateExpenseResult> UpdateExpenseAsync(UpdateExpenseCommand query)
     {

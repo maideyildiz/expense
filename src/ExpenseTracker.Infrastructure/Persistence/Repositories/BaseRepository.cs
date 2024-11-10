@@ -49,4 +49,9 @@ public class BaseRepository<T> : IBaseRepository<T>
         string sql = "DELETE FROM " + typeof(T).Name + "s WHERE Id = @Id";
         return await _dbRepository.ExecuteAsync(sql, new { Id = id });
     }
+
+    public async Task<T?> GetByQueryAsync(string query, object? param = null)
+    {
+        return await _dbRepository.QueryFirstOrDefaultAsync<T>(query, param);
+    }
 }

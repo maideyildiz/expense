@@ -6,6 +6,7 @@ public interface IBaseRepository<T>
 {
     Task<IEnumerable<T>> GetAllAsync();
     Task<T?> GetByIdAsync(Guid id);
+    Task<T?> GetByQueryAsync(string query, object? param = null);
     Task<IEnumerable<T>> GetAllByQueryAsync(string query, object? param = null);
     Task<int> AddAsync(T obj);
     Task<int> UpdateAsync(T obj);
