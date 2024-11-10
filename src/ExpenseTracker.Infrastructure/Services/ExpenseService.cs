@@ -5,7 +5,7 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
-using ExpenseTracker.Core.ExpenseAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
@@ -20,8 +20,6 @@ public class ExpenseService : IExpenseService
     {
         Expense expense = Expense.Create(
             query.Amount,
-            DateTime.UtcNow,
-            DateTime.UtcNow,
             query.Description,
             query.CategoryId,
             userId);
@@ -40,4 +38,8 @@ public class ExpenseService : IExpenseService
         return (items, totalCount);
     }
 
+    public Task<UpdateExpenseResult> UpdateExpenseAsync(UpdateExpenseCommand query)
+    {
+        throw new NotImplementedException();
+    }
 }

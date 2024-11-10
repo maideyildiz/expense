@@ -2,7 +2,7 @@ using ErrorOr;
 
 using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
-using ExpenseTracker.Core.ExpenseAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Application.Common.Interfaces.Services;
 

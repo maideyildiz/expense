@@ -1,10 +1,8 @@
-using ExpenseTracker.Core.Common.Entities;
-using ExpenseTracker.Core.Common.Models;
-using ExpenseTracker.Core.UserAggregate.Entities;
+using ExpenseTracker.Core.Common.Base;
 
-namespace ExpenseTracker.Core.UserAggregate;
+namespace ExpenseTracker.Core.Entities;
 
-public class User : AggregateRoot<Guid>
+public class User : Entity
 {
     private readonly List<Guid> expenseIds = new();
     private readonly List<Guid> investmentIds = new();
@@ -14,11 +12,8 @@ public class User : AggregateRoot<Guid>
     public string PasswordHash { get; private set; }
     public decimal MonthlySalary { get; private set; }
     public decimal YearlySalary { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
     public DateTime LastLoginAt { get; private set; }
     public bool IsActive { get; private set; }
-    public Guid SubscriptionId { get; private set; }
     public Guid CityId { get; private set; }
     public IReadOnlyList<Guid> ExpenseIds => expenseIds.AsReadOnly();
     public IReadOnlyList<Guid> InvestmentIds => investmentIds.AsReadOnly();
@@ -31,13 +26,9 @@ public class User : AggregateRoot<Guid>
         string passwordHash,
         decimal monthlySalary,
         decimal yearlySalary,
-        DateTime createdAt,
-        DateTime updatedAt,
         DateTime lastLoginAt,
         bool isActive,
-        Guid subscriptionId,
         Guid cityId)
-        : base(id)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -45,11 +36,8 @@ public class User : AggregateRoot<Guid>
         PasswordHash = passwordHash;
         MonthlySalary = monthlySalary;
         YearlySalary = yearlySalary;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
         LastLoginAt = lastLoginAt;
         IsActive = isActive;
-        SubscriptionId = subscriptionId;
         CityId = cityId;
     }
 
@@ -58,7 +46,6 @@ public class User : AggregateRoot<Guid>
         string lastName,
         string email,
         string passwordHash,
-        Guid subscriptionId,
         Guid cityId,
         decimal monthlySalary = decimal.Zero,
         decimal yearlySalary = decimal.Zero)
@@ -72,10 +59,7 @@ public class User : AggregateRoot<Guid>
             monthlySalary,
             yearlySalary,
             DateTime.UtcNow,
-            DateTime.UtcNow,
-            DateTime.UtcNow,
             isActive: true,
-            subscriptionId,
             cityId);
     }
 }

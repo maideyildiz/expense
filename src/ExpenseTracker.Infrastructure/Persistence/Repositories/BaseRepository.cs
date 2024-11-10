@@ -1,10 +1,11 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
-using ExpenseTracker.Core.Common.Models;
+using ExpenseTracker.Core.Common.Base;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T>
-    where T : class
+    where T : EntityBase<Guid>
 {
     private readonly IDbRepository _dbRepository;
 

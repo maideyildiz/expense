@@ -1,6 +1,6 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
-using ExpenseTracker.Core.ExpenseAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
 

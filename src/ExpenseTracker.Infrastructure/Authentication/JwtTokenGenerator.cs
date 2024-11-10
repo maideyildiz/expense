@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ExpenseTracker.Application.Common.Interfaces.Authentication;
 using ExpenseTracker.Application.Common.Interfaces.Services;
-using ExpenseTracker.Core.UserAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Infrastructure.Authentication;
 

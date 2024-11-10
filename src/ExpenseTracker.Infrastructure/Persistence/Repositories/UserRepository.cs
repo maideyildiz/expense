@@ -1,6 +1,6 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
-using ExpenseTracker.Core.UserAggregate;
+using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Infrastructure.Helpers;
 
 namespace ExpenseTracker.Infrastructure.Persistence.Repositories;
@@ -33,8 +33,8 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             throw new ArgumentNullException(nameof(user));
 
         await _dbRepository.ExecuteAsync(
-            "INSERT INTO Users (Id, FirstName, LastName, Email, PasswordHash, MonthlySalary, YearlySalary, CreatedAt, UpdatedAt, LastLoginAt, IsActive, SubscriptionId, CityId) " +
-            "VALUES (@Id, @FirstName, @LastName, @Email, @PasswordHash, @MonthlySalary, @YearlySalary, @CreatedAt, @UpdatedAt, @LastLoginAt, @IsActive, @SubscriptionId, @CityId)",
+            "INSERT INTO Users (Id, FirstName, LastName, Email, PasswordHash, MonthlySalary, YearlySalary, CreatedAt, UpdatedAt, LastLoginAt, IsActive, CityId) " +
+            "VALUES (@Id, @FirstName, @LastName, @Email, @PasswordHash, @MonthlySalary, @YearlySalary, @CreatedAt, @UpdatedAt, @LastLoginAt, @IsActive, @CityId)",
             new
             {
                 Id = user.Id, // Assuming UserId has a Value property
@@ -48,7 +48,6 @@ public class UserRepository : BaseRepository<User>, IUserRepository
                 UpdatedAt = user.UpdatedAt,
                 LastLoginAt = user.LastLoginAt,
                 IsActive = user.IsActive,
-                SubscriptionId = user.SubscriptionId, // Assuming SubscriptionId has a Value property
                 CityId = user.CityId, // Assuming CityId has a Value property
             });
     }

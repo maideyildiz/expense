@@ -1,5 +1,5 @@
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
-using ExpenseTracker.Core.UserAggregate;
+using ExpenseTracker.Core.Entities;
 
 namespace ExpenseTracker.Application.Common.Interfaces.Persistence;
 

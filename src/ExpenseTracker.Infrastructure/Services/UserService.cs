@@ -3,10 +3,10 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Infrastructure.Helpers;
 using ExpenseTracker.Application.Authentication.Commands.Register;
-using ExpenseTracker.Core.UserAggregate;
 using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;
 using ExpenseTracker.Application.Authentication.Queries.Login;
+using ExpenseTracker.Core.Entities;
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
@@ -42,7 +42,7 @@ public class UserService : IUserService
             return Errors.Authentication.InvalidCredentials;
         }
         var passwordHash = PasswordHasher.HashPassword(command.Password);
-        var newUser = User.Create(command.FirstName, command.LastName, command.Email, passwordHash, command.SubscriptionId, command.CityId);
+        var newUser = User.Create(command.FirstName, command.LastName, command.Email, passwordHash, command.CityId);
 
         await _userRepository.AddUserAsync(newUser);
 
