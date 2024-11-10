@@ -3,6 +3,10 @@ namespace ExpenseTracker.Core.Entities;
 
 public class City : Entity
 {
+    public City()
+    {
+
+    }
     public string Name { get; private set; }
     public Guid CountryId { get; private set; }
     public string ThreeLetterUAVTCode { get; private set; }

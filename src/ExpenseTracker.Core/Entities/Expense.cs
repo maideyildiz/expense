@@ -3,6 +3,10 @@ namespace ExpenseTracker.Core.Entities;
 
 public class Expense : Entity
 {
+    public Expense()
+    {
+
+    }
     public decimal Amount { get; private set; }
     public string Description { get; private set; }
     public Guid CategoryId { get; private set; }

@@ -14,14 +14,13 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
     {
         _dbRepository = dbRepository;
     }
-
     public async Task<ExpenseResult> GetExpenseByIdAsync(Guid id)
     {
         var query = @"
-        SELECT e.Id, e.Amount, e.CreatedAt, e.Description, c.CategoryName
-        FROM Expenses e
-        LEFT JOIN Categories c ON e.CategoryId = c.Id
-        WHERE e.Id = @Id";
+            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName
+            FROM Expenses e
+            LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
+            WHERE e.Id = @Id";
 
         var expense = await _dbRepository.QuerySingleOrDefaultAsync<ExpenseResult>(query, new { Id = id });
 
@@ -31,9 +30,9 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize)
     {
         string query = @"
-        SELECT e.Id, e.Amount, e.CreatedAt, e.Description, c.CategoryName
+        SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName
         FROM Expenses e
-        LEFT JOIN Categories c ON e.CategoryId = c.Id
+        LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
         WHERE e.UserId = @UserId
         LIMIT @PageSize OFFSET @Offset";
 

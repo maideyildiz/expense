@@ -5,6 +5,10 @@ namespace ExpenseTracker.Core.Entities;
 
 public class Investment : Entity
 {
+    public Investment()
+    {
+
+    }
     public decimal Amount { get; private set; }
     public string Description { get; private set; }
     public Guid UserId { get; private set; }
