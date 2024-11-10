@@ -16,12 +16,12 @@ public class ExpenseService : IExpenseService
     {
         _expenseRepository = expenseRepository;
     }
-    public async Task<ErrorOr<int>> AddExpenseAsync(CreateExpenseCommand query, Guid userId)
+    public async Task<ErrorOr<int>> AddExpenseAsync(CreateExpenseCommand command, Guid userId)
     {
         Expense expense = Expense.Create(
-            query.Amount,
-            query.Description,
-            query.CategoryId,
+            command.Amount,
+            command.Description,
+            command.CategoryId,
             userId);
         return await _expenseRepository.AddAsync(expense);
     }
@@ -41,14 +41,14 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
     }
 
-    public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query)
+    public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand command)
     {
-        Expense? expense = await _expenseRepository.GetByIdAsync(query.Id);
+        Expense? expense = await _expenseRepository.GetByIdAsync(command.Id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
-        expense.Update(query.Amount, query.Description, query.CategoryId);
+        expense.Update(command.Amount, command.Description, command.CategoryId);
         if (await _expenseRepository.UpdateAsync(expense) > 0)
         {
             return await GetExpenseByIdAsync(expense.Id);
