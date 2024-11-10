@@ -35,7 +35,7 @@ public class InvestmentController : ApiController
     public async Task<IActionResult> Post([FromBody] CreateInvestmentRequest request)
     {
         var command = _mapper.Map<CreateInvestmentCommand>(request);
-        ErrorOr<int> result = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
         return result.Match(
             result => Ok(result),
