@@ -5,5 +5,4 @@ public record GetExpenseQueryResult(
     decimal Amount,
     DateTime CreatedAt,
     string Description,
-    string CategoryName,
-    Guid UserId);
+    string CategoryName);

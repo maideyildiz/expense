@@ -1,12 +1,10 @@
-
-
-using ErrorOr;
-
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
+using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Core.Entities;
+using ErrorOr;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
@@ -27,9 +25,15 @@ public class ExpenseService : IExpenseService
         return await _expenseRepository.AddAsync(expense);
     }
 
-    public async Task<GetExpenseQueryResult?> GetExpenseByIdAsync(Guid id)
+    public async Task<ErrorOr<GetExpenseQueryResult?>> GetExpenseByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        Expense? expense = await _expenseRepository.GetByIdAsync(id);
+        if (expense == null)
+        {
+            return Errors.Expense.ExpenseNotFound;
+        }
+        GetExpenseQueryResult getExpenseQueryResult = new GetExpenseQueryResult(expense.Id, expense.Amount, expense.CreatedAt, expense.Description, "");
+        return getExpenseQueryResult;
     }
 
     public Task<(IEnumerable<GetExpenseQueryResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
@@ -44,8 +48,23 @@ public class ExpenseService : IExpenseService
     //     return (items, totalCount);
     // }
 
-    public Task<UpdateExpenseResult> UpdateExpenseAsync(UpdateExpenseCommand query)
+    public async Task<ErrorOr<UpdateExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query)
     {
-        throw new NotImplementedException();
+        Expense? expense = await _expenseRepository.GetByIdAsync(query.Id);
+        if (expense == null)
+        {
+            return Errors.Expense.ExpenseNotFound;
+        }
+        if (await _expenseRepository.UpdateAsync(expense) > 0)
+        {
+            UpdateExpenseResult updateExpenseResult = new UpdateExpenseResult(expense.Amount, expense.Description, expense.UpdatedAt, query.Description);
+            return updateExpenseResult;
+        }
+        else
+        {
+            return Errors.Expense.ExpenseUpdateFailed;
+        }
+
+
     }
 }
