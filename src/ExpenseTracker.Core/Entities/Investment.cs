@@ -35,4 +35,15 @@ public class Investment : Entity
     {
         return new(Guid.NewGuid(), amount, description, userId, categoryId);
     }
+
+    public void Update(
+        decimal amount,
+        string description,
+        Guid categoryId)
+    {
+        Amount = amount;
+        Description = description;
+        CategoryId = categoryId;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

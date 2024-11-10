@@ -1,10 +1,8 @@
-
-using ErrorOr;
-
 using MediatR;
 using System.Security.Claims;
 using ExpenseTracker.Application.Common.Errors;
 using Microsoft.AspNetCore.Http;
+using ErrorOr;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.InvestmentOperations.Common;
 
@@ -20,20 +18,25 @@ public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCo
         _httpContextAccessor = httpContextAccessor;
         _investmentService = investmentService;
     }
-    public async Task<ErrorOr<InvestmentResult>> Handle(CreateInvestmentCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<InvestmentResult>> Handle(CreateInvestmentCommand command, CancellationToken cancellationToken)
     {
         string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
         {
-            return Errors.Expense.ExpenseCreationFailed;
+            return Errors.Investment.InvestmentMustHaveACategory;
         }
         Guid userId;
         if (!Guid.TryParse(userIdStr, out userId))
         {
-            return Errors.Expense.ExpenseCreationFailed;
+            return Errors.Investment.InvestmentMustHaveACategory;
         }
 
-        return await _investmentService.AddInvestmentAsync(request, userId);
+        var result = await _investmentService.AddInvestmentAsync(command, userId);
+        if (result.IsError)
+        {
+            return Errors.Investment.InvestmentMustHaveACategory;
+        }
+        return await _investmentService.GetInvestmentByIdAsync(result.Value);
     }
 }

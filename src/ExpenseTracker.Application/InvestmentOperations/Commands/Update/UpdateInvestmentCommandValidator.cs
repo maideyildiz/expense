@@ -2,11 +2,11 @@ using ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
 using FluentValidation;
 
-namespace ExpenseTracker.Application.ExpenseOperations.Commands.Update;
+namespace ExpenseTracker.Application.InvestmentOperations.Commands.Update;
 
-public class UpdateExpenseCommandValidator : AbstractValidator<CreateExpenseCommand>
+public class UpdateInvestmentCommandValidator : AbstractValidator<CreateExpenseCommand>
 {
-    public UpdateExpenseCommandValidator()
+    public UpdateInvestmentCommandValidator()
     {
         RuleFor(c => c.Amount)
         .GreaterThan(0);
