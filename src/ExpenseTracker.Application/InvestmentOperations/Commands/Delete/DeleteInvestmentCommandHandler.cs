@@ -2,7 +2,7 @@ using ErrorOr;
 
 using MediatR;
 
-namespace ExpenseTracker.Application.InvestmentOperations.Commands;
+namespace ExpenseTracker.Application.InvestmentOperations.Commands.Delete;
 
 
 public class DeleteInvestmentCommandHandler : IRequestHandler<DeleteInvestmentCommand, ErrorOr<int>>

@@ -3,7 +3,7 @@ using ErrorOr;
 
 using MediatR;
 
-namespace ExpenseTracker.Application.InvestmentOperations.Commands;
+namespace ExpenseTracker.Application.InvestmentOperations.Commands.Update;
 
 public class UpdateInvestmentCommandHandler : IRequestHandler<UpdateInvestmentCommand, ErrorOr<int>>
 {

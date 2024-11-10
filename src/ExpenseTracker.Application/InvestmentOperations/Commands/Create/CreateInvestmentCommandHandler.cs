@@ -7,7 +7,7 @@ using ExpenseTracker.Application.Common.Errors;
 using Microsoft.AspNetCore.Http;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 
-namespace ExpenseTracker.Application.InvestmentOperations.Commands;
+namespace ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 
 
 public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCommand, ErrorOr<int>>

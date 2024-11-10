@@ -1,6 +1,6 @@
 using ErrorOr;
 
-using ExpenseTracker.Application.InvestmentOperations.Commands;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 
 namespace ExpenseTracker.Application.Common.Interfaces.Services;
 

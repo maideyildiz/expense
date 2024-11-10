@@ -2,7 +2,7 @@
 using ErrorOr;
 
 using ExpenseTracker.Application.Common.Interfaces.Services;
-using ExpenseTracker.Application.InvestmentOperations.Commands;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
