@@ -9,10 +9,10 @@ namespace ExpenseTracker.Application.Common.Interfaces.Services;
 
 public interface IExpenseService
 {
-    Task<ErrorOr<Guid>> AddExpenseAsync(CreateExpenseCommand query, Guid userId);
+    Task<ErrorOr<Guid>> AddExpenseAsync(CreateExpenseCommand command, Guid userId);
     Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize);
     Task<ErrorOr<ExpenseResult>> GetExpenseByIdAsync(Guid id);
-    Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand query);
+    Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand command);
     Task<ErrorOr<bool>> DeleteExpenseAsync(Guid id);
     Task<bool> CheckIfUserOwnsExpense(Guid userId, Guid expenseId);
 }
