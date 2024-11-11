@@ -10,6 +10,8 @@ using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using ExpenseTracker.Application.UserOperations.Common;
+using ExpenseTracker.Application.UserOperations.Commands;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
@@ -34,7 +36,7 @@ public class UserService : IUserService
         string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrWhiteSpace(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId))
         {
-            return Errors.Investment.InvestmentUpdateFailed;
+            return Errors.Authentication.InvalidCredentials;
         }
 
         return userId;
@@ -73,4 +75,19 @@ public class UserService : IUserService
         return token;
     }
 
+    public async Task<ErrorOr<UserResult>> GetUserDetailsAsync(Guid userId)
+    {
+        var query = @"
+            SELECT u.Id, u.FirstName, u.LastName, u.Email, u.MonthlySalary, u.YearlySalary, c.Name AS CityName
+            FROM Users u
+            LEFT JOIN Cities c ON e.CityId = c.Id
+            WHERE e.Id = @Id";
+
+        var userDetails = await _baseRepository.GetByQueryAsync(query, new { Id = userId });
+        return Errors.Investment.InvestmentUpdateFailed;
+    }
+    public Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId)
+    {
+        throw new NotImplementedException();
+    }
 }

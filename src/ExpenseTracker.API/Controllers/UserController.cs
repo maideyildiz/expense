@@ -6,6 +6,9 @@ using MapsterMapper;
 using MediatR;
 using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
+using ExpenseTracker.Application.UserOperations.Queries;
+using ExpenseTracker.Contracts.UserOperations;
+using ExpenseTracker.Application.UserOperations.Commands;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -24,18 +27,22 @@ public class UserController : ApiController
     [HttpGet("profile")]
     public async Task<IActionResult> GetUserProfile()
     {
-        // var userId = GetUserIdFromClaim();
+        var query = new GetUserProfileQuery();
+        var result = await _mediator.Send(query);
 
-        // var query = new GetUserProfileQuery(userId);
-        // var result = await _mediator.Send(query);
-
-        return Ok();
+        return result.Match(
+            successResult => Ok(_mapper.Map<UserResponse>(result.Value)),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
-
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateUserProfile()
+    public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUserRequest request)
     {
-        return Ok();
+        var command = _mapper.Map<UpdateUserProfileCommand>(request);
+        var result = await _mediator.Send(command);
+
+        return result.Match(
+            successResult => Ok(_mapper.Map<UserResponse>(result.Value)),
+            errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 }
