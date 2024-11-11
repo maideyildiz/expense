@@ -1,4 +1,4 @@
-using ExpenseTracker.Application.UserOperations.Commands;
+using ExpenseTracker.Application.UserOperations.Commands.Update;
 using ExpenseTracker.Application.UserOperations.Common;
 using ExpenseTracker.Contracts.UserOperations;
 

@@ -8,7 +8,7 @@ using ExpenseTracker.Application.ExpenseOperations.Commands;
 using ExpenseTracker.Application.ExpenseOperations.Queries;
 using ExpenseTracker.Application.UserOperations.Queries;
 using ExpenseTracker.Contracts.UserOperations;
-using ExpenseTracker.Application.UserOperations.Commands;
+using ExpenseTracker.Application.UserOperations.Commands.Update;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -44,5 +44,11 @@ public class UserController : ApiController
         return result.Match(
             successResult => Ok(_mapper.Map<UserResponse>(result.Value)),
             errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        return Ok();
     }
 }

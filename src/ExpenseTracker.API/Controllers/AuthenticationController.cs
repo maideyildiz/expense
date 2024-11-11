@@ -46,11 +46,5 @@ public class AuthenticationController : ApiController
             authResult => Ok(this._mapper.Map<string>(authResult)),
             errors => Problem(errors));
     }
-
-    [HttpPost("logout")]
-    public IActionResult Logout()
-    {
-        return Ok();
-    }
 }
 
