@@ -1,8 +1,5 @@
-
-using ErrorOr;
-
 using MediatR;
-
+using ErrorOr;
 namespace ExpenseTracker.Application.UserOperations.Commands;
 
 public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, ErrorOr<int>>

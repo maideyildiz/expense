@@ -1,42 +1,36 @@
-using System.Security.Claims;
-
-using ErrorOr;
-
 using ExpenseTracker.Application.Common.Errors;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.Common.Models;
+using ErrorOr;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
-
-using MediatR;
-
 using Microsoft.AspNetCore.Http;
+using MediatR;
+using System.Security.Claims;
+using ExpenseTracker.Application.Common.Base;
+
 
 namespace ExpenseTracker.Application.ExpenseOperations.Queries
 {
-    public class GetExpenseQueryHandler : IRequestHandler<GetExpenseQuery, ErrorOr<ExpenseResult>>
+    public class GetExpenseQueryHandler : BaseHandler, IRequestHandler<GetExpenseQuery, ErrorOr<ExpenseResult>>
     {
         private readonly IExpenseService _expenseService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GetExpenseQueryHandler(IExpenseService expenseService, IHttpContextAccessor httpContextAccessor)
+        public GetExpenseQueryHandler(
+            IExpenseService expenseService,
+            IUserService userService)
+            : base(userService)
         {
             _expenseService = expenseService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ErrorOr<ExpenseResult>> Handle(GetExpenseQuery query, CancellationToken cancellationToken)
         {
-            string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
+            var userIdResult = GetUserId();
+            if (userIdResult.IsError)
             {
-                return Errors.Expense.ExpenseCreationFailed;
+                return userIdResult.Errors;
             }
-
-            if (!Guid.TryParse(userIdStr, out Guid userId))
-            {
-                return Errors.Expense.ExpenseCreationFailed;
-            }
-            var check = await _expenseService.CheckIfUserOwnsExpense(query.Id, userId);
+            var check = await _expenseService.CheckIfUserOwnsExpense(query.Id, userIdResult.Value);
             if (!check)
             {
                 return Errors.Expense.ExpenseNotFound;

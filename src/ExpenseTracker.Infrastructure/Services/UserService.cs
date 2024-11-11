@@ -8,19 +8,36 @@ using ErrorOr;
 using ExpenseTracker.Application.Authentication.Queries.Login;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
 {
     private readonly IBaseRepository<User> _baseRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserService(
         IJwtTokenGenerator jwtTokenGenerator,
-        IBaseRepository<User> baseRepository)
+        IBaseRepository<User> baseRepository,
+        IHttpContextAccessor httpContextAccessor)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _baseRepository = baseRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public ErrorOr<Guid> GetUserId()
+    {
+        string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId))
+        {
+            return Errors.Investment.InvestmentUpdateFailed;
+        }
+
+        return userId;
     }
 
     public async Task<ErrorOr<string>> LoginUserAsync(LoginQuery query)

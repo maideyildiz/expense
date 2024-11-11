@@ -26,8 +26,8 @@ public class InvestmentService : IInvestmentService
         Investment investment = Investment.Create(
             command.Amount,
             command.Description,
-            command.CategoryId,
-            userId);
+            userId,
+            command.CategoryId);
 
         var result = await _investmentRepository.AddAsync(investment);
         if (result <= 0)

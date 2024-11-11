@@ -4,33 +4,30 @@ using MediatR;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using ErrorOr;
+using ExpenseTracker.Application.Common.Base;
 namespace ExpenseTracker.Application.InvestmentOperations.Commands.Delete;
 
 
-public class DeleteInvestmentCommandHandler : IRequestHandler<DeleteInvestmentCommand, ErrorOr<bool>>
+public class DeleteInvestmentCommandHandler : BaseHandler, IRequestHandler<DeleteInvestmentCommand, ErrorOr<bool>>
 {
     private readonly IInvestmentService _investmentService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public DeleteInvestmentCommandHandler(IInvestmentService investmentService, IHttpContextAccessor httpContextAccessor)
+    public DeleteInvestmentCommandHandler(
+        IInvestmentService investmentService,
+        IUserService userService)
+        : base(userService)
     {
         _investmentService = investmentService;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ErrorOr<bool>> Handle(DeleteInvestmentCommand command, CancellationToken cancellationToken)
     {
-        var userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
+        var userIdResult = GetUserId();
+        if (userIdResult.IsError)
         {
-            return Errors.Investment.InvestmentUpdateFailed;
+            return userIdResult.Errors;
         }
-        Guid userId;
-        if (!Guid.TryParse(userIdStr, out userId))
-        {
-            return Errors.Investment.InvestmentUpdateFailed;
-        }
-        var check = await _investmentService.CheckIfUserOwnsInvestment(command.Id, userId);
+        var check = await _investmentService.CheckIfUserOwnsInvestment(userIdResult.Value, command.Id);
         if (!check)
         {
             return Errors.Investment.InvestmentNotFound;

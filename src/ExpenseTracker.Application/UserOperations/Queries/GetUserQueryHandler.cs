@@ -1,8 +1,5 @@
-
-using ErrorOr;
-
 using MediatR;
-
+using ErrorOr;
 namespace ExpenseTracker.Application.UserOperations.Queries;
 
 public class GetUserQueryHandler : IRequestHandler<GetUserProfileQuery, ErrorOr<int>>

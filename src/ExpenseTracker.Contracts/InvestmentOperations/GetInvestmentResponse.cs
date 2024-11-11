@@ -2,7 +2,8 @@ namespace ExpenseTracker.Contracts.InvestmentOperations;
 public record GetInvestmentResponse(
     Guid Id,
     decimal Amount,
-    DateTime CreatedAt,
     string Description,
-    string CategoryName
+    DateTime UpdatedAt,
+    string CategoryName,
+    Guid UserId
 );

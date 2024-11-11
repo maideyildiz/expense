@@ -29,7 +29,7 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(query);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetInvestmentsResponse>(result)),
+            successResult => Ok(_mapper.Map<GetInvestmentsResponse>(result.Value)),
             error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
@@ -40,7 +40,7 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(query);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetInvestmentResponse>(result)),
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
             error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
@@ -51,7 +51,7 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetInvestmentResponse>(result)),
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
             errors => Problem(errors));
     }
 
@@ -62,7 +62,7 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result)),
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
             errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 
@@ -73,7 +73,7 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            successResult => Ok(_mapper.Map<DeleteInvestmentResponse>(successResult)),
+            successResult => Ok(new DeleteInvestmentResponse(result.Value)),
             errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 }

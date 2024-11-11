@@ -19,7 +19,7 @@ public class InvestmentRepository : BaseRepository<Investment>, IInvestmentRepos
         var query = @"
             SELECT i.Id, i.Amount, i.Description, i.UpdatedAt, c.Name AS CategoryName, i.UserId
             FROM Investments i
-            LEFT JOIN InvestmentCategories c ON e.CategoryId = c.Id
+            LEFT JOIN InvestmentCategories c ON i.CategoryId = c.Id
             WHERE i.Id = @Id";
 
         var investment = await _dbRepository.QuerySingleOrDefaultAsync<InvestmentResult>(query, new { Id = id });
@@ -32,7 +32,7 @@ public class InvestmentRepository : BaseRepository<Investment>, IInvestmentRepos
         string query = @"
         SELECT i.Id, i.Amount, i.Description, i.UpdatedAt, c.Name AS CategoryName, i.UserId
         FROM Investments i
-        LEFT JOIN InvestmentCategories c ON e.CategoryId = c.Id
+        LEFT JOIN InvestmentCategories c ON i.CategoryId = c.Id
         WHERE i.UserId = @UserId
         LIMIT @PageSize OFFSET @Offset";
 
@@ -48,7 +48,7 @@ public class InvestmentRepository : BaseRepository<Investment>, IInvestmentRepos
 
     public async Task<Guid> GetInvestmentUserIdAsync(Guid investmentId)
     {
-        var query = "SELECT UserId FROM Investments WHERE Id = @ExpenseId";
+        var query = "SELECT UserId FROM Investments WHERE Id = @InvestmentId";
         return await _dbRepository.QuerySingleOrDefaultAsync<Guid>(query, new { InvestmentId = investmentId });
     }
 }

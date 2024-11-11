@@ -30,7 +30,7 @@ public class ExpenseController : ApiController
         var result = await _mediator.Send(query);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetExpensesResponse>(result)),
+            successResult => Ok(_mapper.Map<GetExpensesResponse>(result.Value)),
             error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
@@ -41,7 +41,7 @@ public class ExpenseController : ApiController
         var result = await _mediator.Send(query);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetExpenseResponse>(result)),
+            successResult => Ok(_mapper.Map<GetExpenseResponse>(result.Value)),
             error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
@@ -52,7 +52,7 @@ public class ExpenseController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            result => Ok(_mapper.Map<GetExpenseResponse>(result)),
+            successResult => Ok(_mapper.Map<GetExpenseResponse>(result.Value)),
             errors => Problem(errors));
     }
 
@@ -63,7 +63,7 @@ public class ExpenseController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            successResult => Ok(_mapper.Map<GetExpenseResponse>(result)),
+            successResult => Ok(_mapper.Map<GetExpenseResponse>(result.Value)),
             errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 
@@ -74,7 +74,7 @@ public class ExpenseController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            successResult => Ok(_mapper.Map<DeleteExpenseResponse>(successResult)),
+            successResult => Ok(new DeleteExpenseResponse(result.Value)),
             errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 }
