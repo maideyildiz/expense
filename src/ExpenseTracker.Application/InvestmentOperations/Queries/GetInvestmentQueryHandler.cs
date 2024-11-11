@@ -5,33 +5,30 @@ using MediatR;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using ExpenseTracker.Application.Common.Base;
 
 namespace ExpenseTracker.Application.InvestmentOperations.Commands;
 
-public class GetInvestmentQueryHandler : IRequestHandler<GetInvestmentQuery, ErrorOr<InvestmentResult>>
+public class GetInvestmentQueryHandler : BaseHandler, IRequestHandler<GetInvestmentQuery, ErrorOr<InvestmentResult>>
 {
     private readonly IInvestmentService _investmentService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetInvestmentQueryHandler(IInvestmentService investmentService, IHttpContextAccessor httpContextAccessor)
+    public GetInvestmentQueryHandler(
+        IInvestmentService investmentService,
+        IUserService userService)
+        : base(userService)
     {
         _investmentService = investmentService;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ErrorOr<InvestmentResult>> Handle(GetInvestmentQuery query, CancellationToken cancellationToken)
     {
-        string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
+        var userIdResult = GetUserId();
+        if (userIdResult.IsError)
         {
-            return Errors.Investment.InvestmentCreationFailed;
+            return userIdResult.Errors;
         }
-
-        if (!Guid.TryParse(userIdStr, out Guid userId))
-        {
-            return Errors.Investment.InvestmentCreationFailed;
-        }
-        var check = await _investmentService.CheckIfUserOwnsInvestment(query.Id, userId);
+        var check = await _investmentService.CheckIfUserOwnsInvestment(userIdResult.Value, query.Id);
         if (!check)
         {
             return Errors.Investment.InvestmentNotFound;

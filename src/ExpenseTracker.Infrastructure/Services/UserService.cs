@@ -8,19 +8,38 @@ using ErrorOr;
 using ExpenseTracker.Application.Authentication.Queries.Login;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using ExpenseTracker.Application.UserOperations.Common;
+using ExpenseTracker.Application.UserOperations.Commands;
+
 namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
 {
     private readonly IBaseRepository<User> _baseRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserService(
         IJwtTokenGenerator jwtTokenGenerator,
-        IBaseRepository<User> baseRepository)
+        IBaseRepository<User> baseRepository,
+        IHttpContextAccessor httpContextAccessor)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _baseRepository = baseRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public ErrorOr<Guid> GetUserId()
+    {
+        string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userIdStr) || !Guid.TryParse(userIdStr, out Guid userId))
+        {
+            return Errors.Authentication.InvalidCredentials;
+        }
+
+        return userId;
     }
 
     public async Task<ErrorOr<string>> LoginUserAsync(LoginQuery query)
@@ -56,4 +75,19 @@ public class UserService : IUserService
         return token;
     }
 
+    public async Task<ErrorOr<UserResult>> GetUserDetailsAsync(Guid userId)
+    {
+        var query = @"
+            SELECT u.Id, u.FirstName, u.LastName, u.Email, u.MonthlySalary, u.YearlySalary, c.Name AS CityName
+            FROM Users u
+            LEFT JOIN Cities c ON e.CityId = c.Id
+            WHERE e.Id = @Id";
+
+        var userDetails = await _baseRepository.GetByQueryAsync(query, new { Id = userId });
+        return Errors.Investment.InvestmentUpdateFailed;
+    }
+    public Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId)
+    {
+        throw new NotImplementedException();
+    }
 }

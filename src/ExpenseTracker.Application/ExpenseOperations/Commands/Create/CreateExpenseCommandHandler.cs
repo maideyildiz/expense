@@ -7,36 +7,30 @@ using ErrorOr;
 using MediatR;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
+using ExpenseTracker.Application.Common.Base;
 
 namespace ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 
-public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand, ErrorOr<ExpenseResult>>
+public class CreateExpenseCommandHandler : BaseHandler, IRequestHandler<CreateExpenseCommand, ErrorOr<ExpenseResult>>
 {
     private readonly IExpenseService _expenseService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CreateExpenseCommandHandler(
         IExpenseService expenseService,
-        IHttpContextAccessor httpContextAccessor)
+        IUserService userService)
+        : base(userService)
     {
         _expenseService = expenseService;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ErrorOr<ExpenseResult>> Handle(CreateExpenseCommand command, CancellationToken cancellationToken)
     {
-        string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
+        var userIdResult = GetUserId();
+        if (userIdResult.IsError)
         {
-            return Errors.Expense.ExpenseCreationFailed;
+            return userIdResult.Errors;
         }
-        Guid userId;
-        if (!Guid.TryParse(userIdStr, out userId))
-        {
-            return Errors.Expense.ExpenseCreationFailed;
-        }
-        var result = await _expenseService.AddExpenseAsync(command, userId);
+        var result = await _expenseService.AddExpenseAsync(command, userIdResult.Value);
         if (result.IsError)
         {
             return Errors.Expense.ExpenseCreationFailed;

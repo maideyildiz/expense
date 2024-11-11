@@ -5,6 +5,9 @@ using ExpenseTracker.Contracts.InvestmentOperations;
 using MapsterMapper;
 using MediatR;
 using ExpenseTracker.Application.InvestmentOperations.Commands.Create;
+using ExpenseTracker.Application.InvestmentOperations.Commands;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Update;
+using ExpenseTracker.Application.InvestmentOperations.Commands.Delete;
 namespace ExpenseTracker.API.Controllers;
 [Route("investment")]
 public class InvestmentController : ApiController
@@ -20,15 +23,25 @@ public class InvestmentController : ApiController
 
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] GetInvestmentsRequest request)
     {
-        return Ok();
+        var query = _mapper.Map<GetInvestmentsQuery>(request);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            successResult => Ok(_mapper.Map<GetInvestmentsResponse>(result.Value)),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-        return Ok();
+        var query = new GetInvestmentQuery(id);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
     [HttpPost]
@@ -38,19 +51,29 @@ public class InvestmentController : ApiController
         var result = await _mediator.Send(command);
 
         return result.Match(
-            result => Ok(result),
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
             errors => Problem(errors));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update()
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateInvestmentRequest request)
     {
-        return Ok();
+        var command = new UpdateInvestmentCommand(id, request.Amount, request.Description, request.CategoryId);
+        var result = await _mediator.Send(command);
+
+        return result.Match(
+            successResult => Ok(_mapper.Map<GetInvestmentResponse>(result.Value)),
+            errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        return Ok();
+        var command = new DeleteInvestmentCommand(id);
+        var result = await _mediator.Send(command);
+
+        return result.Match(
+            successResult => Ok(new DeleteInvestmentResponse(result.Value)),
+            errors => Problem(statusCode: (int)errors.First().Type, detail: errors.First().Description));
     }
 }

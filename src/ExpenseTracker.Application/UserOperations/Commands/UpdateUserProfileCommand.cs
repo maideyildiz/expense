@@ -1,6 +1,6 @@
 using ErrorOr;
-
 using MediatR;
+using ExpenseTracker.Application.UserOperations.Common;
 
 namespace ExpenseTracker.Application.UserOperations.Commands;
 
@@ -12,4 +12,4 @@ public record UpdateUserProfileCommand(
     decimal MonthlySalary,
     decimal YearlySalary,
     bool IsActive,
-    Guid CityId) : IRequest<ErrorOr<int>>;
+    Guid CityId) : IRequest<ErrorOr<UserResult>>;

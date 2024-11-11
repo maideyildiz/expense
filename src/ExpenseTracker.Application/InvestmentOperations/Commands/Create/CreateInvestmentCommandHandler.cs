@@ -5,38 +5,38 @@ using Microsoft.AspNetCore.Http;
 using ErrorOr;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.InvestmentOperations.Common;
+using ExpenseTracker.Application.Common.Base;
 
 namespace ExpenseTracker.Application.InvestmentOperations.Commands.Create;
 
 
-public class CreateInvestmentCommandHandler : IRequestHandler<CreateInvestmentCommand, ErrorOr<InvestmentResult>>
+public class CreateInvestmentCommandHandler : BaseHandler, IRequestHandler<CreateInvestmentCommand, ErrorOr<InvestmentResult>>
 {
     private readonly IInvestmentService _investmentService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    public CreateInvestmentCommandHandler(IHttpContextAccessor httpContextAccessor, IInvestmentService investmentService)
+
+    public CreateInvestmentCommandHandler(
+        IInvestmentService investmentService,
+        IUserService userService)
+        : base(userService)
     {
-        _httpContextAccessor = httpContextAccessor;
         _investmentService = investmentService;
     }
+
     public async Task<ErrorOr<InvestmentResult>> Handle(CreateInvestmentCommand command, CancellationToken cancellationToken)
     {
-        string? userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userIdStr is null || string.IsNullOrWhiteSpace(userIdStr))
+        var userIdResult = GetUserId();
+        if (userIdResult.IsError)
         {
-            return Errors.Investment.InvestmentMustHaveACategory;
-        }
-        Guid userId;
-        if (!Guid.TryParse(userIdStr, out userId))
-        {
-            return Errors.Investment.InvestmentMustHaveACategory;
+            return userIdResult.Errors;
         }
 
-        var result = await _investmentService.AddInvestmentAsync(command, userId);
+        var result = await _investmentService.AddInvestmentAsync(command, userIdResult.Value);
         if (result.IsError)
         {
             return Errors.Investment.InvestmentMustHaveACategory;
         }
+
         return await _investmentService.GetInvestmentByIdAsync(result.Value);
     }
 }
+
