@@ -2,7 +2,7 @@ using ErrorOr;
 using MediatR;
 using ExpenseTracker.Application.UserOperations.Common;
 
-namespace ExpenseTracker.Application.UserOperations.Commands;
+namespace ExpenseTracker.Application.UserOperations.Commands.Update;
 
 public record UpdateUserProfileCommand(
     string FirstName,

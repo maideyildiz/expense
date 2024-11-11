@@ -3,7 +3,7 @@ using ErrorOr;
 using ExpenseTracker.Application.Common.Base;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Application.UserOperations.Common;
-namespace ExpenseTracker.Application.UserOperations.Commands;
+namespace ExpenseTracker.Application.UserOperations.Commands.Update;
 
 public class UpdateUserProfileCommandHandler : BaseHandler, IRequestHandler<UpdateUserProfileCommand, ErrorOr<UserResult>>
 {

@@ -3,7 +3,7 @@ using ErrorOr;
 
 using MediatR;
 
-namespace ExpenseTracker.Application.Authentication.Commands.Logout;
+namespace ExpenseTracker.Application.UserOperations.Commands.Logout;
 
 public class LogoutCommandHandler : IRequestHandler<LogoutCommand, ErrorOr<bool>>
 {
