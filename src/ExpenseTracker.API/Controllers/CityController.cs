@@ -30,4 +30,15 @@ public class CityController : ApiController
             error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Get([FromRoute] Guid id)
+    {
+        var query = new GetCityQuery(id);
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            successResult => Ok(_mapper.Map<GetCityResponse>(result.Value)),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
+    }
+
 }
