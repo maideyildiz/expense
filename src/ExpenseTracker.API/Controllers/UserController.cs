@@ -9,6 +9,7 @@ using ExpenseTracker.Application.ExpenseOperations.Queries;
 using ExpenseTracker.Application.UserOperations.Queries;
 using ExpenseTracker.Contracts.UserOperations;
 using ExpenseTracker.Application.UserOperations.Commands.Update;
+using ExpenseTracker.Application.UserOperations.Commands.Logout;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -47,8 +48,13 @@ public class UserController : ApiController
     }
 
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
-        return Ok();
+        var query = new LogoutCommand();
+        var result = await _mediator.Send(query);
+
+        return result.Match(
+            successResult => Ok(result.Value),
+            error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
     }
 }

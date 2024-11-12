@@ -113,8 +113,8 @@ public class UserService : IUserService
         }
     }
 
-    public Task<ErrorOr<bool>> LogoutUserAsync(Guid userId)
+    public async Task<ErrorOr<bool>> LogoutUserAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        return true;
     }
 }
