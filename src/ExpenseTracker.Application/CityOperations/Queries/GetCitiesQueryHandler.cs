@@ -7,9 +7,9 @@ using MediatR;
 namespace ExpenseTracker.Application.CityOperations.Queries;
 
 
-public class GetCitiesQueryHandler : IRequestHandler<GetCitiesQuery, ErrorOr<PagedResult<GetCitiesResult>>>
+public class GetCitiesQueryHandler : IRequestHandler<GetCitiesQuery, ErrorOr<PagedResult<GetCityResult>>>
 {
-    public async Task<ErrorOr<PagedResult<GetCitiesResult>>> Handle(GetCitiesQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PagedResult<GetCityResult>>> Handle(GetCitiesQuery request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
