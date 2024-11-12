@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.CityOperations.Queries;
+namespace ExpenseTracker.Application.CityOperations.Common;
 
 public record GetCityResult(
     Guid Id,

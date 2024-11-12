@@ -1,5 +1,6 @@
 using ErrorOr;
 
+using ExpenseTracker.Application.CityOperations.Common;
 using ExpenseTracker.Application.Common.Models;
 
 using MediatR;

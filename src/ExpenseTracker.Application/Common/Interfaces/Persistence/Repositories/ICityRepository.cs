@@ -1,4 +1,4 @@
-using ExpenseTracker.Application.CityOperations.Queries;
+using ExpenseTracker.Application.CityOperations.Common;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Core.Entities;
 
@@ -6,5 +6,5 @@ namespace ExpenseTracker.Application.Common.Interfaces.Services;
 
 public interface ICityRepository : IBaseRepository<City>
 {
-    Task<(IEnumerable<GetCitiesResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize);
+    Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize);
 }

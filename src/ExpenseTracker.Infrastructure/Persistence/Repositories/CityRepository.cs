@@ -1,5 +1,5 @@
 
-using ExpenseTracker.Application.CityOperations.Queries;
+using ExpenseTracker.Application.CityOperations.Common;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Core.Entities;
@@ -16,7 +16,7 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         _dbRepository = dbRepository;
     }
 
-    public async Task<(IEnumerable<GetCitiesResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
+    public async Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
     {
         string query = @"
         SELECT c.Id, c.Name
@@ -25,11 +25,11 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         WHERE co.CountryId = @CountryId
         LIMIT @PageSize OFFSET @Offset";
 
-        var expenses = await _dbRepository.QueryAsync<GetCitiesResult>(query, new { CountryId = countryId, PageSize = pageSize, Offset = (page - 1) * pageSize });
+        var cities = await _dbRepository.QueryAsync<GetCityResult>(query, new { CountryId = countryId, PageSize = pageSize, Offset = (page - 1) * pageSize });
 
         string countQuery = "SELECT COUNT(*) FROM Cities WHERE CountryId = @CountryId";
         int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { CountryId = countryId });
 
-        return (expenses, totalCount);
+        return (cities, totalCount);
     }
 }
