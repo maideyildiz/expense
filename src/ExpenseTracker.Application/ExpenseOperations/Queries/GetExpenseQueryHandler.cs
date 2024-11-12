@@ -30,7 +30,7 @@ namespace ExpenseTracker.Application.ExpenseOperations.Queries
             {
                 return userIdResult.Errors;
             }
-            var check = await _expenseService.CheckIfUserOwnsExpense(query.Id, userIdResult.Value);
+            var check = await _expenseService.CheckIfUserOwnsExpense(userIdResult.Value, query.Id);
             if (!check)
             {
                 return Errors.Expense.ExpenseNotFound;

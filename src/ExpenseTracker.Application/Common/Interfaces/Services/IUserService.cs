@@ -14,4 +14,5 @@ public interface IUserService
     public Task<ErrorOr<string>> LoginUserAsync(LoginQuery query);
     public Task<ErrorOr<UserResult>> GetUserDetailsAsync(Guid userId);
     public Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId);
+    public Task<ErrorOr<bool>> LogoutUserAsync(Guid userId);
 }

@@ -6,6 +6,6 @@ using MediatR;
 namespace ExpenseTracker.Application.ExpenseOperations.Commands.Update;
 public record UpdateExpenseCommand(
     Guid Id,
-    decimal Amount,
-    string Description,
-    Guid CategoryId) : IRequest<ErrorOr<ExpenseResult>>;
+    decimal? Amount,
+    string? Description,
+    Guid? CategoryId) : IRequest<ErrorOr<ExpenseResult>>;

@@ -25,7 +25,7 @@ public class DeleteExpenseCommandHandler : BaseHandler, IRequestHandler<DeleteEx
         {
             return userIdResult.Errors;
         }
-        var check = await _expenseService.CheckIfUserOwnsExpense(command.Id, userIdResult.Value);
+        var check = await _expenseService.CheckIfUserOwnsExpense(userIdResult.Value, command.Id);
         if (!check)
         {
             return Errors.Expense.ExpenseNotFound;

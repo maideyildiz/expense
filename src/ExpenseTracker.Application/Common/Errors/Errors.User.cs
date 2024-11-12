@@ -6,6 +6,7 @@ public static partial class Errors
 {
     public static class User
     {
+        public static Error UserUpdateFailed => Error.Validation("User.UserUpdateFailed", "The operation failed. Please check your information and try again.");
         public static Error InvalidUserId => Error.Validation("User.InvalidUserId", "The operation failed. Please check your information and try again.");
         public static Error UserMustHaveFirstAndLastName => Error.Conflict("User.UserMustHaveFirstAndLastName", "User must have first and last name.");
         public static Error DublicateEmail => Error.Conflict("User.DublicateEmail", "The operation failed. Please check your information and try again.");

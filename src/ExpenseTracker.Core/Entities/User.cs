@@ -69,6 +69,27 @@ namespace ExpenseTracker.Core.Entities
                 isActive: true,
                 cityId);
         }
+        public void Update(
+            string? firstName,
+            string? lastName,
+            string? email,
+            string? passwordHash,
+            Guid? cityId,
+            decimal? monthlySalary,
+            decimal? yearlySalary,
+            bool? isActive)
+        {
+            FirstName = firstName is not null ? firstName : FirstName;
+            LastName = lastName is not null ? lastName : LastName;
+            Email = email is not null ? email : Email;
+            PasswordHash = passwordHash is not null ? passwordHash : PasswordHash;
+            MonthlySalary = monthlySalary is not null ? monthlySalary.Value : MonthlySalary;
+            YearlySalary = yearlySalary is not null ? yearlySalary.Value : YearlySalary;
+            LastLoginAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+            IsActive = isActive is not null ? isActive.Value : IsActive;
+            CityId = cityId is not null ? cityId.Value : CityId;
+        }
 
         public void AddInvestment(Investment investment)
         {
