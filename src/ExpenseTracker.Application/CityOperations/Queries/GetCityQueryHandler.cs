@@ -1,6 +1,7 @@
 using ErrorOr;
 
 using ExpenseTracker.Application.CityOperations.Common;
+using ExpenseTracker.Application.Common.Interfaces.Services;
 
 using MediatR;
 
@@ -9,8 +10,15 @@ namespace ExpenseTracker.Application.CityOperations.Queries;
 
 public class GetCityQueryHandler : IRequestHandler<GetCityQuery, ErrorOr<GetCityResult>>
 {
-    public Task<ErrorOr<GetCityResult>> Handle(GetCityQuery request, CancellationToken cancellationToken)
+    private readonly ICityService _cityService;
+
+    public GetCityQueryHandler(ICityService cityService)
     {
-        throw new NotImplementedException();
+        _cityService = cityService;
+    }
+
+    public Task<ErrorOr<GetCityResult>> Handle(GetCityQuery query, CancellationToken cancellationToken)
+    {
+        return _cityService.GetCityByIdAsync(query.Id);
     }
 }
