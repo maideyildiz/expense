@@ -11,9 +11,19 @@ public class CategoryController : ApiController
     {
         return Ok();
     }
-
+    [HttpGet("investment/{id}")]
+    public async Task<IActionResult> GetInvestmentCategory([FromRoute] Guid id)
+    {
+        return Ok();
+    }
     [HttpGet("expense")]
     public async Task<IActionResult> GetExpenseCategories()
+    {
+        return Ok();
+    }
+
+    [HttpGet("expense/{id}")]
+    public async Task<IActionResult> GetExpenseCategory([FromRoute] Guid id)
     {
         return Ok();
     }
