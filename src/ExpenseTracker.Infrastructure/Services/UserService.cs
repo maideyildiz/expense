@@ -17,17 +17,17 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
 {
-    private readonly IBaseRepository<User> _baseRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserService(
         IJwtTokenGenerator jwtTokenGenerator,
-        IBaseRepository<User> baseRepository,
+        IUserRepository userRepository,
         IHttpContextAccessor httpContextAccessor)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
-        _baseRepository = baseRepository;
+        _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -45,7 +45,7 @@ public class UserService : IUserService
     public async Task<ErrorOr<string>> LoginUserAsync(LoginQuery query)
     {
         var sql = "SELECT * FROM Users WHERE Email = @Email";
-        var user = await _baseRepository.GetByQueryAsync(sql, new { Email = query.Email });
+        var user = await _userRepository.GetByQueryAsync(sql, new { Email = query.Email });
 
         if (user is null || !user.IsActive || !PasswordHasher.VerifyPassword(query.Password, user.PasswordHash))
         {
@@ -60,7 +60,7 @@ public class UserService : IUserService
     public async Task<ErrorOr<string>> RegisterUserAsync(RegisterCommand command)
     {
         var sql = "SELECT * FROM Users WHERE Email = @Email";
-        var existingUser = await _baseRepository.GetByQueryAsync(sql, new { Email = command.Email });
+        var existingUser = await _userRepository.GetByQueryAsync(sql, new { Email = command.Email });
         if (existingUser?.Id != null)
         {
             return Errors.Authentication.InvalidCredentials;
@@ -68,7 +68,7 @@ public class UserService : IUserService
         var passwordHash = PasswordHasher.HashPassword(command.Password);
         var newUser = User.Create(command.FirstName, command.LastName, command.Email, passwordHash, command.CityId);
 
-        await _baseRepository.AddAsync(newUser);
+        await _userRepository.AddAsync(newUser);
 
         var token = _jwtTokenGenerator.GenerateToken(newUser);
 
@@ -77,16 +77,43 @@ public class UserService : IUserService
 
     public async Task<ErrorOr<UserResult>> GetUserDetailsAsync(Guid userId)
     {
-        var query = @"
-            SELECT u.Id, u.FirstName, u.LastName, u.Email, u.MonthlySalary, u.YearlySalary, c.Name AS CityName
-            FROM Users u
-            LEFT JOIN Cities c ON e.CityId = c.Id
-            WHERE e.Id = @Id";
+        var userDetails = await _userRepository.GetUserDetailsAsync(userId);
+        if (userDetails == null)
+        {
+            return Errors.User.UserNotFound;
+        }
 
-        var userDetails = await _baseRepository.GetByQueryAsync(query, new { Id = userId });
-        return Errors.Investment.InvestmentUpdateFailed;
+        return userDetails;
     }
-    public Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId)
+    public async Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            return Errors.User.UserNotFound;
+        }
+        string psw = command.Password == null ? user.PasswordHash : PasswordHasher.HashPassword(command.Password);
+        user.Update(
+            command.FirstName,
+            command.LastName,
+            command.Email,
+            psw,
+            command.CityId,
+            command.MonthlySalary,
+            command.YearlySalary,
+            command.IsActive);
+
+        if (await _userRepository.UpdateAsync(user) > 0)
+        {
+            return await _userRepository.GetUserDetailsAsync(userId);
+        }
+        else
+        {
+            return Errors.User.UserUpdateFailed;
+        }
+    }
+
+    public Task<ErrorOr<bool>> LogoutUserAsync(Guid userId)
     {
         throw new NotImplementedException();
     }

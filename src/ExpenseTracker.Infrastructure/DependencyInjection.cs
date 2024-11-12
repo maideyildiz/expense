@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddDbConnection(configuration);
         services.AddCustomLogging(configuration);
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IInvestmentRepository, InvestmentRepository>();
         services.AddScoped<IUserService, UserService>();

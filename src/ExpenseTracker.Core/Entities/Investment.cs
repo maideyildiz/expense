@@ -37,13 +37,13 @@ public class Investment : Entity
     }
 
     public void Update(
-        decimal amount,
-        string description,
-        Guid categoryId)
+        decimal? amount,
+        string? description,
+        Guid? categoryId)
     {
-        Amount = amount;
-        Description = description;
-        CategoryId = categoryId;
+        Amount = amount is not null ? amount.Value : Amount;
+        Description = description is not null ? description : Description;
+        CategoryId = categoryId is not null ? categoryId.Value : CategoryId;
         UpdatedAt = DateTime.UtcNow;
     }
 }
