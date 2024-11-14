@@ -8,7 +8,6 @@ using MediatR;
 namespace ExpenseTracker.API.Controllers;
 
 [Route("category")]
-[AllowAnonymous]
 public class CategoryController : ApiController
 {
     private readonly ISender _mediator;
