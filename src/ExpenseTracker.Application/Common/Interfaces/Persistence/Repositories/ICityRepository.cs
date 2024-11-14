@@ -7,4 +7,5 @@ namespace ExpenseTracker.Application.Common.Interfaces.Services;
 public interface ICityRepository : IBaseRepository<City>
 {
     Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize);
+    Task<GetCityResult?> GetCityByIdAsync(Guid id);
 }

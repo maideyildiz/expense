@@ -22,7 +22,7 @@ public class CountryService : ICountryService
 
     public async Task<ErrorOr<GetCountryResult>> GetCountryByIdAsync(Guid id)
     {
-        var country = await _countryRepository.GetByIdAsync(id);
+        var country = await _countryRepository.GetCountryByIdAsync(id);
         if (country == null)
         {
             return Errors.Country.NotFound;

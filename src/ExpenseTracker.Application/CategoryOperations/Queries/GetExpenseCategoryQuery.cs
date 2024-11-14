@@ -7,4 +7,4 @@ using MediatR;
 namespace ExpenseTracker.Application.CategoryOperations.Queries;
 
 
-public record GetExpenseCategoryQuery(Guid Id) : IRequest<ErrorOr<GetExpenseCategoryResult>>;
+public record GetExpenseCategoryQuery(Guid Id) : IRequest<ErrorOr<CategoryResult>>;

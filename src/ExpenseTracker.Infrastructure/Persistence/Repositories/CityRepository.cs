@@ -22,7 +22,7 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         SELECT c.Id, c.Name
         FROM Cities c
         LEFT JOIN Countries co ON c.CountryId = co.Id
-        WHERE co.CountryId = @CountryId
+        WHERE co.Id = @CountryId
         LIMIT @PageSize OFFSET @Offset";
 
         var cities = await _dbRepository.QueryAsync<GetCityResult>(query, new { CountryId = countryId, PageSize = pageSize, Offset = (page - 1) * pageSize });
@@ -31,5 +31,15 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { CountryId = countryId });
 
         return (cities, totalCount);
+    }
+
+    public async Task<GetCityResult?> GetCityByIdAsync(Guid id)
+    {
+        var query = @"
+            SELECT c.Id, c.Name
+            FROM Cities c
+            WHERE c.Id = @Id";
+
+        return await _dbRepository.QuerySingleOrDefaultAsync<GetCityResult>(query, new { Id = id });
     }
 }

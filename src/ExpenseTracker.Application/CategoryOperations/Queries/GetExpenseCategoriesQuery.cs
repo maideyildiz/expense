@@ -7,4 +7,4 @@ using MediatR;
 
 namespace ExpenseTracker.Application.CategoryOperations.Queries;
 
-public record GetExpenseCategoriesQuery(int Page, int PageSize) : IRequest<ErrorOr<PagedResult<GetExpenseCategoryResult>>>;
+public record GetExpenseCategoriesQuery(int Page, int PageSize) : IRequest<ErrorOr<PagedResult<CategoryResult>>>;

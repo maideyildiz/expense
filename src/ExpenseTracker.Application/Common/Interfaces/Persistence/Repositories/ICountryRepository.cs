@@ -7,4 +7,5 @@ namespace ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 public interface ICountryRepository : IBaseRepository<Country>
 {
     Task<(IEnumerable<GetCountryResult> Items, int TotalCount)> GetCountriesAsync(int page, int pageSize);
+    Task<GetCountryResult?> GetCountryByIdAsync(Guid id);
 }

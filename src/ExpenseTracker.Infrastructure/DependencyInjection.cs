@@ -32,6 +32,8 @@ public static class DependencyInjection
         services.AddDbConnection(configuration);
         services.AddCustomLogging(configuration);
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        services.AddScoped<IInvestmentCategoryRepository, InvestmentCategoryRepository>();
+        services.AddScoped<IExpenseCategoryRepository, ExpenseCategoryRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICityRepository, CityRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
@@ -40,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<ICityService, CityService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IInvestmentService, InvestmentService>();
         services.AddAuth(configuration);
