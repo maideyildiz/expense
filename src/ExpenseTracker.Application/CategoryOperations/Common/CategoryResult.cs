@@ -1,6 +1,6 @@
 namespace ExpenseTracker.Application.CategoryOperations.Common;
 
-public record GetExpenseCategoryResult(
+public record CategoryResult(
     Guid Id,
     string Name
 );

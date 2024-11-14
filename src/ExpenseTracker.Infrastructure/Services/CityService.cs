@@ -24,7 +24,7 @@ public class CityService : ICityService
 
     public async Task<ErrorOr<GetCityResult>> GetCityByIdAsync(Guid id)
     {
-        var city = await _cityRepository.GetByIdAsync(id);
+        var city = await _cityRepository.GetCityByIdAsync(id);
         if (city == null)
         {
             return Errors.City.NotFound;

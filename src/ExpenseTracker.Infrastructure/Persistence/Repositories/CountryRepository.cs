@@ -28,4 +28,14 @@ public class CountryRepository : BaseRepository<Country>, ICountryRepository
 
         return (countries, totalCount);
     }
+
+    public async Task<GetCountryResult?> GetCountryByIdAsync(Guid id)
+    {
+        var query = @"
+            SELECT c.Id, c.Name
+            FROM Countries c
+            WHERE c.Id = @Id";
+
+        return await _dbRepository.QuerySingleOrDefaultAsync<GetCountryResult>(query, new { Id = id });
+    }
 }
