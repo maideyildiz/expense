@@ -28,7 +28,7 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
         return expense;
     }
 
-    public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize)
+    public async Task<IEnumerable<ExpenseResult>> GetExpensesByUserIdAsync(Guid userId, int page, int pageSize)
     {
         string query = @"
         SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
@@ -41,10 +41,7 @@ public class ExpenseRepository : BaseRepository<Expense>, IExpenseRepository
             query,
             new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });
 
-        string countQuery = "SELECT COUNT(*) FROM Expenses WHERE UserId = @UserId";
-        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { UserId = userId });
-
-        return (expenses, totalCount);
+        return expenses;
     }
 
     public async Task<Guid> GetExpenseUserIdAsync(Guid expenseId)

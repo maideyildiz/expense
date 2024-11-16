@@ -14,7 +14,7 @@ public class CountryRepository : BaseRepository<Country>, ICountryRepository
         _dbRepository = dbRepository;
     }
 
-    public async Task<(IEnumerable<GetCountryResult> Items, int TotalCount)> GetCountriesAsync(int page, int pageSize)
+    public async Task<IEnumerable<GetCountryResult>> GetCountriesAsync(int page, int pageSize)
     {
         string query = @"
         SELECT c.Id, c.Name
@@ -22,11 +22,7 @@ public class CountryRepository : BaseRepository<Country>, ICountryRepository
         LIMIT @PageSize OFFSET @Offset";
 
         var countries = await _dbRepository.QueryAsync<GetCountryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
-
-        string countQuery = "SELECT COUNT(*) FROM Countries";
-        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery);
-
-        return (countries, totalCount);
+        return countries;
     }
 
     public async Task<GetCountryResult?> GetCountryByIdAsync(Guid id)

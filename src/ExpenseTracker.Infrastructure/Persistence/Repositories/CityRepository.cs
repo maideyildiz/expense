@@ -16,7 +16,7 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         _dbRepository = dbRepository;
     }
 
-    public async Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
+    public async Task<IEnumerable<GetCityResult>> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
     {
         string query = @"
         SELECT c.Id, c.Name
@@ -27,10 +27,7 @@ public class CityRepository : BaseRepository<City>, ICityRepository
 
         var cities = await _dbRepository.QueryAsync<GetCityResult>(query, new { CountryId = countryId, PageSize = pageSize, Offset = (page - 1) * pageSize });
 
-        string countQuery = "SELECT COUNT(*) FROM Cities WHERE CountryId = @CountryId";
-        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { CountryId = countryId });
-
-        return (cities, totalCount);
+        return cities;
     }
 
     public async Task<GetCityResult?> GetCityByIdAsync(Guid id)

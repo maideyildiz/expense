@@ -66,7 +66,8 @@ public class ExpenseService : IExpenseService
 
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
     {
-        return await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
+        var expenses = await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
+        return (expenses, expenses.Count());
     }
 
     public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand command)
