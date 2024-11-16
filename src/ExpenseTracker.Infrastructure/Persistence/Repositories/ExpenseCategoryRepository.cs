@@ -13,19 +13,16 @@ public class ExpenseCategoryRepository : BaseRepository<ExpenseCategory>, IExpen
         _dbRepository = dbRepository;
     }
 
-    public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetExpenseCategoriesAsync(int page, int pageSize)
+    public async Task<IEnumerable<CategoryResult>> GetExpenseCategoriesAsync(int page, int pageSize)
     {
         string query = @"
         SELECT ec.Id, ec.Name
         FROM ExpenseCategories ec
         LIMIT @PageSize OFFSET @Offset";
 
-        var countries = await _dbRepository.QueryAsync<CategoryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
+        var categories = await _dbRepository.QueryAsync<CategoryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
 
-        string countQuery = "SELECT COUNT(*) FROM ExpenseCategories";
-        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery);
-
-        return (countries, totalCount);
+        return categories;
     }
 
     public async Task<CategoryResult?> GetExpenseCategoryByIdAsync(Guid id)

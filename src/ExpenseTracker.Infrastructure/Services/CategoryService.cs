@@ -25,27 +25,26 @@ public class CategoryService : ICategoryService
 
     public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetExpenseCategoriesAsync(int page, int pageSize)
     {
-        // string key = $"ExpenseCategories_{page}_{pageSize}";
+        string key = $"ExpenseCategories_{page}_{pageSize}";
 
-        // var cachedData = await _cache.GetStringAsync(key);
-        // if (!string.IsNullOrEmpty(cachedData))
-        // {
-        //     var cachedResult = JsonSerializer.Deserialize<(IEnumerable<CategoryResult> Items, int TotalCount)>(cachedData);
-        //     if (cachedResult.Items.Any())
-        //     {
-        //         return cachedResult;
-        //     }
-        // }
+        var cachedData = await _cache.GetStringAsync(key);
+        if (!string.IsNullOrEmpty(cachedData))
+        {
+            var cachedResult = JsonSerializer.Deserialize<IEnumerable<CategoryResult>>(cachedData);
+            if (cachedResult != null && cachedResult.Any())
+            {
+                return (cachedResult, cachedResult.Count());
+            }
+        }
 
         var data = await _expenseCategoryRepository.GetExpenseCategoriesAsync(page, pageSize);
+        var serializedData = JsonSerializer.Serialize(data);
+        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
+        });
 
-        // var serializedData = JsonSerializer.Serialize(data);
-        // await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        // {
-        //     AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        // });
-
-        return data;
+        return (data, data.Count());
     }
 
     public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetInvestmentCategoriesAsync(int page, int pageSize)
@@ -55,27 +54,21 @@ public class CategoryService : ICategoryService
         var cachedData = await _cache.GetStringAsync(key);
         if (!string.IsNullOrEmpty(cachedData))
         {
-            var cachedResult = JsonSerializer.Deserialize<(IEnumerable<CategoryResult> Items, int TotalCount)>(cachedData);
-            if (cachedResult.Items.Any())
+            var cachedResult = JsonSerializer.Deserialize<IEnumerable<CategoryResult>>(cachedData);
+            if (cachedResult != null && cachedResult.Any())
             {
-                return cachedResult;
+                return (cachedResult, cachedResult.Count());
             }
         }
 
         var data = await _investmentCategoryRepository.GetInvestmentCategoriesAsync(page, pageSize);
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true // Daha okunabilir JSON çıktısı için
-        };
-
-        var serializedDatass = JsonSerializer.Serialize(data, options);
         var serializedData = JsonSerializer.Serialize(data);
         await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
         });
 
-        return data;
+        return (data, data.Count());
     }
 
     public async Task<ErrorOr<CategoryResult>> GetExpenseCategoryByIdAsync(Guid id)

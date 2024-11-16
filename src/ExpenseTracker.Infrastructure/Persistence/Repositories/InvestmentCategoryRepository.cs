@@ -13,19 +13,16 @@ public class InvestmentCategoryRepository : BaseRepository<InvestmentCategory>, 
         _dbRepository = dbRepository;
     }
 
-    public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetInvestmentCategoriesAsync(int page, int pageSize)
+    public async Task<IEnumerable<CategoryResult>> GetInvestmentCategoriesAsync(int page, int pageSize)
     {
         string query = @"
         SELECT ic.Id, ic.Name
         FROM InvestmentCategories ic
         LIMIT @PageSize OFFSET @Offset";
 
-        var countries = await _dbRepository.QueryAsync<CategoryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
+        var categories = await _dbRepository.QueryAsync<CategoryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
 
-        string countQuery = "SELECT COUNT(*) FROM InvestmentCategories";
-        int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery);
-
-        return (countries, totalCount);
+        return categories;
     }
 
     public async Task<CategoryResult?> GetInvestmentCategoryByIdAsync(Guid id)

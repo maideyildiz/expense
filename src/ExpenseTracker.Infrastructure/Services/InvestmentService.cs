@@ -83,7 +83,8 @@ public class InvestmentService : IInvestmentService
 
     public async Task<(IEnumerable<InvestmentResult> Items, int TotalCount)> GetInvestmentsAsync(Guid userId, int page, int pageSize)
     {
-        return await _investmentRepository.GetInvestmentsByUserIdAsync(userId, page, pageSize);
+        var investments = await _investmentRepository.GetInvestmentsByUserIdAsync(userId, page, pageSize);
+        return (investments, investments.Count());
     }
 
     public async Task<ErrorOr<InvestmentResult>> UpdateInvestmentAsync(UpdateInvestmentCommand command)
