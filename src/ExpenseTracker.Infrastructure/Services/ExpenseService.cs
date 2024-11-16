@@ -13,9 +13,15 @@ namespace ExpenseTracker.Infrastructure.Services;
 public class ExpenseService : IExpenseService
 {
     private readonly IExpenseRepository _expenseRepository;
-    public ExpenseService(IExpenseRepository expenseRepository)
+    private readonly ICacheService _redisCacheService;
+    private string GetExpensesCacheKey(Guid userId) => $"GetExpensesAsync_{userId}";
+    private string GetExpenseByIdCacheKey(Guid id) => $"GetExpenseByIdAsync_{id}";
+    public ExpenseService(
+        IExpenseRepository expenseRepository,
+        ICacheService redisCacheService)
     {
         _expenseRepository = expenseRepository;
+        _redisCacheService = redisCacheService;
     }
     public async Task<ErrorOr<Guid>> AddExpenseAsync(CreateExpenseCommand command, Guid userId)
     {
@@ -32,6 +38,7 @@ public class ExpenseService : IExpenseService
         }
         else
         {
+            await _redisCacheService.RemoveAsync(GetExpensesCacheKey(expense.UserId));
             return expense.Id;
         }
     }
@@ -50,29 +57,55 @@ public class ExpenseService : IExpenseService
         }
         else
         {
+            await _redisCacheService.RemoveAsync(GetExpenseByIdCacheKey(expense.Id));
+            await _redisCacheService.RemoveAsync(GetExpensesCacheKey(expense.UserId));
             return true;
         }
     }
 
     public async Task<ErrorOr<ExpenseResult>> GetExpenseByIdAsync(Guid id)
     {
+        string cacheKey = GetExpenseByIdCacheKey(id);
+        var cachedData = await _redisCacheService.GetAsync<ExpenseResult>(cacheKey);
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
         var expense = await _expenseRepository.GetExpenseByIdAsync(id);
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
+        await _redisCacheService.SetAsync(cacheKey, expense);
         return expense;
     }
 
     public async Task<(IEnumerable<ExpenseResult> Items, int TotalCount)> GetExpensesAsync(Guid userId, int page, int pageSize)
     {
+        var cacheKey = GetExpensesCacheKey(userId);
+        var cachedData = await _redisCacheService.GetAsync<IEnumerable<ExpenseResult>>(cacheKey);
+        if (cachedData != null && cachedData.Any())
+        {
+            return (cachedData, cachedData.Count());
+        }
         var expenses = await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
+        await _redisCacheService.SetAsync(cacheKey, expenses);
         return (expenses, expenses.Count());
     }
 
     public async Task<ErrorOr<ExpenseResult>> UpdateExpenseAsync(UpdateExpenseCommand command)
     {
-        Expense expense = await _expenseRepository.GetByIdAsync(command.Id);
+        Expense expense = null;
+        string cacheKey = GetExpenseByIdCacheKey(command.Id);
+        var cachedData = await _redisCacheService.GetAsync<Expense>(cacheKey);
+        if (cachedData != null)
+        {
+            expense = cachedData;
+        }
+        else
+        {
+            expense = await _expenseRepository.GetByIdAsync(command.Id);
+        }
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
@@ -80,6 +113,8 @@ public class ExpenseService : IExpenseService
         expense.Update(command.Amount, command.Description, command.CategoryId);
         if (await _expenseRepository.UpdateAsync(expense) > 0)
         {
+            await _redisCacheService.RemoveAsync(GetExpenseByIdCacheKey(expense.Id));
+            await _redisCacheService.RemoveAsync(GetExpensesCacheKey(expense.UserId));
             return await GetExpenseByIdAsync(expense.Id);
         }
         else

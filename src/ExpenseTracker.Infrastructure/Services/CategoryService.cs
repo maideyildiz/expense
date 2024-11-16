@@ -10,103 +10,83 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class CategoryService : ICategoryService
 {
-    private readonly IDistributedCache _cache;
+    private readonly ICacheService _redisCacheService;
     private readonly IInvestmentCategoryRepository _investmentCategoryRepository;
     private readonly IExpenseCategoryRepository _expenseCategoryRepository;
     public CategoryService(
         IInvestmentCategoryRepository investmentCategoryRepository,
         IExpenseCategoryRepository expenseCategoryRepository,
-        IDistributedCache cache)
+        ICacheService redisCacheService)
     {
         _investmentCategoryRepository = investmentCategoryRepository;
         _expenseCategoryRepository = expenseCategoryRepository;
-        _cache = cache;
+        _redisCacheService = redisCacheService;
     }
 
     public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetExpenseCategoriesAsync(int page, int pageSize)
     {
-        string key = $"ExpenseCategories_{page}_{pageSize}";
+        string cacheKey = $"ExpenseCategories_{page}_{pageSize}";
 
-        var cachedData = await _cache.GetStringAsync(key);
-        if (!string.IsNullOrEmpty(cachedData))
+        var cachedData = await _redisCacheService.GetAsync<IEnumerable<CategoryResult>>(cacheKey);
+        if (cachedData != null && cachedData.Any())
         {
-            var cachedResult = JsonSerializer.Deserialize<IEnumerable<CategoryResult>>(cachedData);
-            if (cachedResult != null && cachedResult.Any())
-            {
-                return (cachedResult, cachedResult.Count());
-            }
+            return (cachedData, cachedData.Count());
         }
 
         var data = await _expenseCategoryRepository.GetExpenseCategoriesAsync(page, pageSize);
-        var serializedData = JsonSerializer.Serialize(data);
-        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        });
-
+        await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
 
     public async Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetInvestmentCategoriesAsync(int page, int pageSize)
     {
-        string key = $"InvestmentCategories_{page}_{pageSize}";
-
-        var cachedData = await _cache.GetStringAsync(key);
-        if (!string.IsNullOrEmpty(cachedData))
+        string cacheKey = $"InvestmentCategories_{page}_{pageSize}";
+        var cachedData = await _redisCacheService.GetAsync<IEnumerable<CategoryResult>>(cacheKey);
+        if (cachedData != null && cachedData.Any())
         {
-            var cachedResult = JsonSerializer.Deserialize<IEnumerable<CategoryResult>>(cachedData);
-            if (cachedResult != null && cachedResult.Any())
-            {
-                return (cachedResult, cachedResult.Count());
-            }
+            return (cachedData, cachedData.Count());
         }
 
         var data = await _investmentCategoryRepository.GetInvestmentCategoriesAsync(page, pageSize);
-        var serializedData = JsonSerializer.Serialize(data);
-        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        });
-
+        await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
 
     public async Task<ErrorOr<CategoryResult>> GetExpenseCategoryByIdAsync(Guid id)
     {
-        string key = $"ExpenseCategoryById_{id}";
+        string cacheKey = $"ExpenseCategoryById_{id}";
 
-        var cachedData = await _cache.GetStringAsync(key);
-        if (!string.IsNullOrEmpty(cachedData))
+        var cachedData = await _redisCacheService.GetAsync<CategoryResult>(cacheKey);
+        if (cachedData != null)
         {
-            var cachedResult = JsonSerializer.Deserialize<CategoryResult>(cachedData);
-            if (cachedResult != null)
-            {
-                return cachedResult;
-            }
+            return cachedData;
         }
 
-        var data = await _expenseCategoryRepository.GetExpenseCategoryByIdAsync(id);
-        if (data == null)
+        var expenseCategory = await _expenseCategoryRepository.GetExpenseCategoryByIdAsync(id);
+        if (expenseCategory == null)
         {
             return Errors.Category.NotFound;
         }
 
-        var serializedData = JsonSerializer.Serialize(data);
-        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        });
+        await _redisCacheService.SetAsync(cacheKey, expenseCategory);
 
-        return data;
+        return expenseCategory;
     }
 
     public async Task<ErrorOr<CategoryResult>> GetInvestmentCategoryByIdAsync(Guid id)
     {
+        string cacheKey = $"InvestmentCategoryById_{id}";
+        var cachedData = await _redisCacheService.GetAsync<CategoryResult>(cacheKey);
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
         var investmentCategory = await _investmentCategoryRepository.GetInvestmentCategoryByIdAsync(id);
         if (investmentCategory == null)
         {
             return Errors.Category.NotFound;
         }
+        await _redisCacheService.SetAsync(cacheKey, investmentCategory);
 
         return investmentCategory;
     }

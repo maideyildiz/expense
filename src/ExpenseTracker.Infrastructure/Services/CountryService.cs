@@ -10,52 +10,39 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class CountryService : ICountryService
 {
-    private readonly IDistributedCache _cache;
+    private readonly ICacheService _redisCacheService;
     private readonly ICountryRepository _countryRepository;
 
     public CountryService(
-        ICountryRepository countryRepository,
-        IDistributedCache cache)
+        ICacheService redisCacheService,
+        ICountryRepository countryRepository)
     {
+        _redisCacheService = redisCacheService;
         _countryRepository = countryRepository;
-        _cache = cache;
     }
 
     public async Task<(IEnumerable<GetCountryResult> Items, int TotalCount)> GetCountriesAsync(int page, int pageSize)
     {
-        string key = $"GetCountriesAsync_{page}_{pageSize}";
+        var cacheKey = $"GetCountriesAsync_{page}_{pageSize}";
+        var cachedData = await _redisCacheService.GetAsync<IEnumerable<GetCountryResult>>(cacheKey);
 
-        var cachedData = await _cache.GetStringAsync(key);
-        if (!string.IsNullOrEmpty(cachedData))
+        if (cachedData != null && cachedData.Any())
         {
-            var cachedResult = JsonSerializer.Deserialize<IEnumerable<GetCountryResult>>(cachedData);
-            if (cachedResult != null && cachedResult.Any())
-            {
-                return (cachedResult, cachedResult.Count());
-            }
+            return (cachedData, cachedData.Count());
         }
 
         var data = await _countryRepository.GetCountriesAsync(page, pageSize);
-        var serializedData = JsonSerializer.Serialize(data);
-        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        });
+        await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
 
     public async Task<ErrorOr<GetCountryResult>> GetCountryByIdAsync(Guid id)
     {
-        string key = $"GetCountryByIdAsync{id}";
-
-        var cachedData = await _cache.GetStringAsync(key);
-        if (!string.IsNullOrEmpty(cachedData))
+        string cacheKey = $"GetCountryByIdAsync_{id}";
+        var cachedData = await _redisCacheService.GetAsync<GetCountryResult>(cacheKey);
+        if (cachedData != null)
         {
-            var cachedResult = JsonSerializer.Deserialize<GetCountryResult>(cachedData);
-            if (cachedResult != null)
-            {
-                return cachedResult;
-            }
+            return cachedData;
         }
 
         var country = await _countryRepository.GetCountryByIdAsync(id);
@@ -63,11 +50,8 @@ public class CountryService : ICountryService
         {
             return Errors.Country.NotFound;
         }
-        var serializedData = JsonSerializer.Serialize(country);
-        await _cache.SetStringAsync(key, serializedData, new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
-        });
+        await _redisCacheService.SetAsync(cacheKey, country);
+
         return country;
     }
 }

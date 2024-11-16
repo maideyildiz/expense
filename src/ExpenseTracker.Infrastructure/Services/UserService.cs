@@ -20,15 +20,21 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICacheService _redisCacheService;
+    private string GetUserByEmailCacheKey(string email) => $"GetUserByEmailAsync_{email}";
+    private string GetUserByIdCacheKey(Guid id) => $"GetUserByIdAsync_{id}";
+    private string GetUserDetailsByIdCacheKey(Guid id) => $"GetUserDetailsByIdAsync_{id}";
 
     public UserService(
         IJwtTokenGenerator jwtTokenGenerator,
         IUserRepository userRepository,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        ICacheService redisCacheService)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
+        _redisCacheService = redisCacheService;
     }
 
     public ErrorOr<Guid> GetUserId()
@@ -44,6 +50,14 @@ public class UserService : IUserService
 
     public async Task<ErrorOr<string>> LoginUserAsync(LoginQuery query)
     {
+        string token = string.Empty;
+        var cacheKey = GetUserByEmailCacheKey(query.Email);
+        var cachedData = await _redisCacheService.GetAsync<User>(cacheKey);
+        if (cachedData != null)
+        {
+            token = this._jwtTokenGenerator.GenerateToken(cachedData);
+        }
+
         var sql = "SELECT * FROM Users WHERE Email = @Email";
         var user = await _userRepository.GetByQueryAsync(sql, new { Email = query.Email });
 
@@ -51,8 +65,8 @@ public class UserService : IUserService
         {
             return Errors.Authentication.InvalidCredentials;
         }
-
-        var token = this._jwtTokenGenerator.GenerateToken(user);
+        await _redisCacheService.SetAsync(cacheKey, user);
+        token = this._jwtTokenGenerator.GenerateToken(user);
 
         return token;
     }
@@ -77,17 +91,33 @@ public class UserService : IUserService
 
     public async Task<ErrorOr<UserResult>> GetUserDetailsAsync(Guid userId)
     {
+        var cacheKey = GetUserDetailsByIdCacheKey(userId);
+        var cachedData = await _redisCacheService.GetAsync<UserResult>(cacheKey);
+        if (cachedData != null)
+        {
+            return cachedData;
+        }
         var userDetails = await _userRepository.GetUserDetailsAsync(userId);
         if (userDetails == null)
         {
             return Errors.User.UserNotFound;
         }
-
+        await _redisCacheService.SetAsync(cacheKey, userDetails);
         return userDetails;
     }
     public async Task<ErrorOr<UserResult>> UpdateUserDetailsAsync(UpdateUserProfileCommand command, Guid userId)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
+        User user = null;
+        var cacheKey = GetUserByIdCacheKey(userId);
+        var cachedData = await _redisCacheService.GetAsync<User>(cacheKey);
+        if (cachedData != null)
+        {
+            user = cachedData;
+        }
+        else
+        {
+            user = await _userRepository.GetByIdAsync(userId);
+        }
         if (user == null)
         {
             return Errors.User.UserNotFound;
@@ -105,6 +135,8 @@ public class UserService : IUserService
 
         if (await _userRepository.UpdateAsync(user) > 0)
         {
+            await _redisCacheService.RemoveAsync(GetUserByEmailCacheKey(user.Email));
+            await _redisCacheService.RemoveAsync(GetUserByIdCacheKey(userId));
             return await _userRepository.GetUserDetailsAsync(userId);
         }
         else
