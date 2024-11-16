@@ -22,6 +22,8 @@ using ExpenseTracker.Infrastructure.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Core.Entities;
 using Dapper;
+using ExpenseTracker.Infrastructure.Cache;
+using StackExchange.Redis;
 
 public static class DependencyInjection
 {
@@ -118,13 +120,31 @@ public static class DependencyInjection
 
     public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
     {
+        // 1. RedisSettings'i yapılandır ve valide et
         var redisSettings = new RedisSettings();
         configuration.Bind(RedisSettings.SectionName, redisSettings);
+
+        if (string.IsNullOrWhiteSpace(redisSettings.ConnectionString))
+        {
+            throw new ArgumentException("Redis connection string is not configured.");
+        }
+
+        // 2. RedisSettings'i DI konteynerine ekle
+        services.AddSingleton(redisSettings);
+
+        // 3. StackExchange.Redis cache servisini ekle
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = redisSettings.ConnectionString;
             options.InstanceName = redisSettings.InstanceName;
         });
+
+        // 4. ConnectionMultiplexer'i singleton olarak ekle
+        var connectionMultiplexer = ConnectionMultiplexer.Connect(redisSettings.ConnectionString);
+        services.AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
+
+        // 5. ICacheService implementasyonu olarak RedisCacheService'i scoped ekle
+        services.AddScoped<ICacheService, RedisCacheService>();
 
         return services;
     }
