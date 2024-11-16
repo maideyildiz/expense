@@ -27,7 +27,7 @@ public class InvestmentRepository : BaseRepository<Investment>, IInvestmentRepos
         return investment;
     }
 
-    public async Task<(IEnumerable<InvestmentResult> Items, int TotalCount)> GetInvestmentsByUserIdAsync(Guid userId, int page, int pageSize)
+    public async Task<IEnumerable<InvestmentResult>> GetInvestmentsByUserIdAsync(Guid userId, int page, int pageSize)
     {
         string query = @"
         SELECT i.Id, i.Amount, i.Description, i.UpdatedAt, c.Name AS CategoryName, i.UserId
@@ -36,14 +36,14 @@ public class InvestmentRepository : BaseRepository<Investment>, IInvestmentRepos
         WHERE i.UserId = @UserId
         LIMIT @PageSize OFFSET @Offset";
 
-        var investment = await _dbRepository.QueryAsync<InvestmentResult>(
+        var investments = await _dbRepository.QueryAsync<InvestmentResult>(
             query,
             new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });
 
         string countQuery = "SELECT COUNT(*) FROM Investments WHERE UserId = @UserId";
         int totalCount = await _dbRepository.ExecuteScalarAsync<int>(countQuery, new { UserId = userId });
 
-        return (investment, totalCount);
+        return investments;
     }
 
     public async Task<Guid> GetInvestmentUserIdAsync(Guid investmentId)

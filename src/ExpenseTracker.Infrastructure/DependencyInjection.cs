@@ -30,6 +30,7 @@ public static class DependencyInjection
         ConfigurationManager configuration)
     {
         services.AddDbConnection(configuration);
+        services.AddRedis(configuration);
         services.AddCustomLogging(configuration);
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddScoped<IInvestmentCategoryRepository, InvestmentCategoryRepository>();
@@ -111,6 +112,19 @@ public static class DependencyInjection
                 autoCreateTable: true).CreateLogger();
 
         services.AddSingleton(Serilog.Log.Logger);
+
+        return services;
+    }
+
+    public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+    {
+        var redisSettings = new RedisSettings();
+        configuration.Bind(RedisSettings.SectionName, redisSettings);
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisSettings.ConnectionString;
+            options.InstanceName = redisSettings.InstanceName;
+        });
 
         return services;
     }

@@ -5,7 +5,7 @@ namespace ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 
 public interface IExpenseCategoryRepository : IBaseRepository<ExpenseCategory>
 {
-    Task<(IEnumerable<CategoryResult> Items, int TotalCount)> GetExpenseCategoriesAsync(int page, int pageSize);
+    Task<IEnumerable<CategoryResult>> GetExpenseCategoriesAsync(int page, int pageSize);
     Task<CategoryResult?> GetExpenseCategoryByIdAsync(Guid id);
 
 }

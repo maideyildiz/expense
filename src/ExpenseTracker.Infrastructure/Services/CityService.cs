@@ -19,7 +19,8 @@ public class CityService : ICityService
 
     public async Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
     {
-        return await _cityRepository.GetCitiesByCountryIdAsync(countryId, page, pageSize);
+        var cities = await _cityRepository.GetCitiesByCountryIdAsync(countryId, page, pageSize);
+        return (cities, cities.Count());
     }
 
     public async Task<ErrorOr<GetCityResult>> GetCityByIdAsync(Guid id)
