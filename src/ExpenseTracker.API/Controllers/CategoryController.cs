@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MapsterMapper;
 using MediatR;
+using ExpenseTracker.Application.CategoryOperations.Common;
 
 namespace ExpenseTracker.API.Controllers;
 
@@ -22,7 +23,7 @@ public class CategoryController : ApiController
     [HttpGet("investment")]
     public async Task<IActionResult> GetInvestmentCategories([FromQuery] GetCategoriesRequest request)
     {
-        var query = _mapper.Map<GetInvestmentCategoriesQuery>(request);
+        var query = _mapper.Map<GetCategoriesQuery>(request);
         var result = await _mediator.Send(query);
 
         return result.Match(
@@ -32,7 +33,7 @@ public class CategoryController : ApiController
     [HttpGet("investment/{id}")]
     public async Task<IActionResult> GetInvestmentCategory([FromRoute] Guid id)
     {
-        var query = new GetInvestmentCategoryQuery(id);
+        var query = new GetCategoryQuery(id);
         var result = await _mediator.Send(query);
 
         return result.Match(
@@ -42,7 +43,7 @@ public class CategoryController : ApiController
     [HttpGet("expense")]
     public async Task<IActionResult> GetExpensesCategories([FromQuery] GetCategoriesRequest request)
     {
-        var query = _mapper.Map<GetExpenseCategoriesQuery>(request);
+        var query = _mapper.Map<GetCategoriesQuery>(request);
         var result = await _mediator.Send(query);
 
         return result.Match(
@@ -53,7 +54,7 @@ public class CategoryController : ApiController
     [HttpGet("expense/{id}")]
     public async Task<IActionResult> GetExpenseCategory([FromRoute] Guid id)
     {
-        var query = new GetExpenseCategoryQuery(id);
+        var query = new GetCategoryQuery(id);
         var result = await _mediator.Send(query);
 
         return result.Match(

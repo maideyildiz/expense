@@ -7,7 +7,7 @@ using ExpenseTracker.Application.Common.Models;
 namespace ExpenseTracker.Application.CategoryOperations.Queries;
 
 
-public class GetExpenseCategoriesQueryHandler : IRequestHandler<GetExpenseCategoriesQuery, ErrorOr<PagedResult<CategoryResult>>>
+public class GetExpenseCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, ErrorOr<PagedResult<CategoryResult>>>
 {
     private readonly ICategoryService _categoryService;
 
@@ -16,7 +16,7 @@ public class GetExpenseCategoriesQueryHandler : IRequestHandler<GetExpenseCatego
         _categoryService = categoryService;
     }
 
-    public async Task<ErrorOr<PagedResult<CategoryResult>>> Handle(GetExpenseCategoriesQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PagedResult<CategoryResult>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
     {
         var (items, totalCount) = await _categoryService.GetExpenseCategoriesAsync(query.Page, query.PageSize);
 

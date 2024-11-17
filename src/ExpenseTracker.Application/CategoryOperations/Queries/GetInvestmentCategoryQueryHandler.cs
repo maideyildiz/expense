@@ -6,7 +6,7 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 
 namespace ExpenseTracker.Application.CategoryOperations.Queries;
 
-public class GetInvestmentCategoryQueryHandler : IRequestHandler<GetInvestmentCategoryQuery, ErrorOr<CategoryResult>>
+public class GetInvestmentCategoryQueryHandler : IRequestHandler<GetCategoryQuery, ErrorOr<CategoryResult>>
 {
     private readonly ICategoryService _categoryService;
 
@@ -15,7 +15,7 @@ public class GetInvestmentCategoryQueryHandler : IRequestHandler<GetInvestmentCa
         _categoryService = categoryService;
     }
 
-    public async Task<ErrorOr<CategoryResult>> Handle(GetInvestmentCategoryQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<CategoryResult>> Handle(GetCategoryQuery query, CancellationToken cancellationToken)
     {
         return await _categoryService.GetInvestmentCategoryByIdAsync(query.Id);
     }

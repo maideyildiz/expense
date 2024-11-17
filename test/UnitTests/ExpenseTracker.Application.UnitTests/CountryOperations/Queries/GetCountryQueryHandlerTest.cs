@@ -6,7 +6,7 @@ using ExpenseTracker.Application.CountryOperations.Queries;
 using ErrorOr;
 using System.Threading;
 using System.Threading.Tasks;
-namespace ExpenseTracker.Test.UnitTests.CountryOperations.Queries;
+namespace ExpenseTracker.Application.UnitTests.CountryOperations.Queries;
 
 public class GetCountryQueryHandlerTests
 {
