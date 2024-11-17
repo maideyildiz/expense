@@ -6,7 +6,7 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 
 using Moq;
 
-namespace ExpenseTracker.UnitTests.Application.UnitTests.CityOperations.Queries;
+namespace ExpenseTracker.Application.UnitTests.CityOperations.Queries;
 
 
 public class GetCitiesQueryHandlerTests

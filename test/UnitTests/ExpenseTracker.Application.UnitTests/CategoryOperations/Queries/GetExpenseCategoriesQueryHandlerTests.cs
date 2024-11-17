@@ -4,7 +4,7 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 
 using Moq;
 
-namespace ExpenseTracker.UnitTests.Application.UnitTests.CategoryOperations.Queries;
+namespace ExpenseTracker.Application.UnitTests.CategoryOperations.Queries;
 
 
 public class GetExpenseCategoriesQueryHandlerTests
