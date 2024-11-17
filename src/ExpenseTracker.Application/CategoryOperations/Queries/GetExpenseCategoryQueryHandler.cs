@@ -5,7 +5,7 @@ using MediatR;
 
 namespace ExpenseTracker.Application.CategoryOperations.Queries;
 
-public class GetExpenseCategoryQueryHandler : IRequestHandler<GetExpenseCategoryQuery, ErrorOr<CategoryResult>>
+public class GetExpenseCategoryQueryHandler : IRequestHandler<GetCategoryQuery, ErrorOr<CategoryResult>>
 {
     private readonly ICategoryService _categoryService;
 
@@ -14,7 +14,7 @@ public class GetExpenseCategoryQueryHandler : IRequestHandler<GetExpenseCategory
         _categoryService = categoryService;
     }
 
-    public async Task<ErrorOr<CategoryResult>> Handle(GetExpenseCategoryQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<CategoryResult>> Handle(GetCategoryQuery query, CancellationToken cancellationToken)
     {
         return await _categoryService.GetExpenseCategoryByIdAsync(query.Id);
     }
