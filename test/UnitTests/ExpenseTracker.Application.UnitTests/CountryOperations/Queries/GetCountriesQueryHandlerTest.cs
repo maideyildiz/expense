@@ -4,7 +4,7 @@ using ExpenseTracker.Application.CountryOperations.Queries;
 
 using Moq;
 
-namespace ExpenseTracker.Test.UnitTests.CountryOperations.Queries;
+namespace ExpenseTracker.UnitTests.Application.UnitTests.CountryOperations.Queries;
 
 
 public class GetCountriesQueryHandlerTests

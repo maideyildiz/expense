@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ExpenseTracker.Application.CityOperations.Common;
 using ExpenseTracker.Application.CityOperations.Queries;
-namespace ExpenseTracker.Application.UnitTests.CityOperations.Queries;
+namespace ExpenseTracker.UnitTests.Application.UnitTests.CityOperations.Queries;
 
 public class GetCityQueryHandlerTest
 {
