@@ -7,6 +7,7 @@ using ErrorOr;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Update;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 namespace ExpenseTracker.Infrastructure.Services;
 

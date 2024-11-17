@@ -1,4 +1,4 @@
-using ExpenseTracker.Application.Common.Interfaces.Services;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 using Newtonsoft.Json;
 
