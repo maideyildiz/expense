@@ -5,6 +5,7 @@ using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Application.CityOperations.Common;
 using ExpenseTracker.Application.Common.Interfaces.Cache;
+using ExpenseTracker.Application.CountryOperations.Common;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
@@ -26,12 +27,10 @@ public class CityService : ICityService
     {
         var cacheKey = $"GetCitiesAsync_{page}_{pageSize}";
         var cachedData = await _redisCacheService.GetAsync<IEnumerable<GetCityResult>>(cacheKey);
-
         if (cachedData != null && cachedData.Any())
         {
             return (cachedData, cachedData.Count());
         }
-
         var cities = await _cityRepository.GetCitiesByCountryIdAsync(countryId, page, pageSize);
         await _redisCacheService.SetAsync(cacheKey, cities);
         return (cities, cities.Count());
