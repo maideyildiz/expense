@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.UnitTests;
+namespace ExpenseTracker.Core.UnitTests;
 
 public class UnitTest1
 {
