@@ -6,6 +6,7 @@ using ExpenseTracker.Application.InvestmentOperations.Commands.Update;
 using ExpenseTracker.Application.InvestmentOperations.Common;
 using ExpenseTracker.Core.Entities;
 using ErrorOr;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 namespace ExpenseTracker.Infrastructure.Services;
 

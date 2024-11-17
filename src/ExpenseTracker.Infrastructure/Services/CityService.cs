@@ -4,6 +4,7 @@ using ExpenseTracker.Application.Common.Interfaces.Persistence.Repositories;
 using ExpenseTracker.Application.Common.Interfaces.Services;
 using ExpenseTracker.Core.Entities;
 using ExpenseTracker.Application.CityOperations.Common;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 namespace ExpenseTracker.Infrastructure.Services;
 

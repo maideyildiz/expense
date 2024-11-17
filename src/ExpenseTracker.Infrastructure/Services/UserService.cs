@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using ExpenseTracker.Application.UserOperations.Common;
 using ExpenseTracker.Application.UserOperations.Commands.Update;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 namespace ExpenseTracker.Infrastructure.Services;
 

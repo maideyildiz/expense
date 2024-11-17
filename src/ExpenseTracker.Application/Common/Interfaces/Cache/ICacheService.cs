@@ -1,4 +1,4 @@
-namespace ExpenseTracker.Application.Common.Interfaces.Services;
+namespace ExpenseTracker.Application.Common.Interfaces.Cache;
 
 public interface ICacheService
 {

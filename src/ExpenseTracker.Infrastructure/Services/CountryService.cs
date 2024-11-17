@@ -5,6 +5,7 @@ using ExpenseTracker.Application.Common.Errors;
 using ErrorOr;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using ExpenseTracker.Application.Common.Interfaces.Cache;
 
 namespace ExpenseTracker.Infrastructure.Services;
 
