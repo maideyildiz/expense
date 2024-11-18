@@ -1,10 +1,9 @@
-namespace ExpenseTracker.API.Controllers;
 using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ExpenseTracker.API.Common.Http;
-
+namespace ExpenseTracker.API.Controllers;
 [ApiController]
 [Authorize]
 public class ApiController : ControllerBase

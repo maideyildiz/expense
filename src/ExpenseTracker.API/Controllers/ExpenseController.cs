@@ -23,6 +23,16 @@ public class ExpenseController : ApiController
         this._mediator = mediator;
         this._mapper = mapper;
     }
+    // [HttpGet]
+    // public async Task<IActionResult> ExpenseFeed([FromQuery] GetExpensesRequest request)
+    // {
+    //     var query = _mapper.Map<GetExpensesQuery>(request);
+    //     var result = await _mediator.Send(query);
+
+    //     return result.Match(
+    //         successResult => Ok(_mapper.Map<GetExpensesResponse>(result.Value)),
+    //         error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
+    // }
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] GetExpensesRequest request)
     {
