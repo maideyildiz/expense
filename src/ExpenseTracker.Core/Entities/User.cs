@@ -11,6 +11,7 @@ namespace ExpenseTracker.Core.Entities
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Email { get; private set; }
+        public string Username { get; private set; }
         public string PasswordHash { get; private set; }
         public decimal MonthlySalary { get; private set; }
         public decimal YearlySalary { get; private set; }
@@ -27,6 +28,7 @@ namespace ExpenseTracker.Core.Entities
             string firstName,
             string lastName,
             string email,
+            string username,
             string passwordHash,
             decimal monthlySalary,
             decimal yearlySalary,
@@ -38,6 +40,7 @@ namespace ExpenseTracker.Core.Entities
             FirstName = firstName;
             LastName = lastName;
             Email = email;
+            Username = username;
             PasswordHash = passwordHash;
             MonthlySalary = monthlySalary;
             YearlySalary = yearlySalary;
@@ -52,6 +55,7 @@ namespace ExpenseTracker.Core.Entities
             string firstName,
             string lastName,
             string email,
+            string username,
             string passwordHash,
             Guid cityId,
             decimal monthlySalary = decimal.Zero,
@@ -62,6 +66,7 @@ namespace ExpenseTracker.Core.Entities
                 firstName,
                 lastName,
                 email,
+                username,
                 passwordHash,
                 monthlySalary,
                 yearlySalary,
