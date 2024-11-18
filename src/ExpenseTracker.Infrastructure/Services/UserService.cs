@@ -81,7 +81,7 @@ public class UserService : IUserService
             return Errors.Authentication.InvalidCredentials;
         }
         var passwordHash = PasswordHasher.HashPassword(command.Password);
-        var newUser = User.Create(command.FirstName, command.LastName, command.Email, passwordHash, command.CityId);
+        var newUser = User.Create(command.FirstName, command.LastName, command.Email, command.Username, passwordHash, command.CityId);
 
         await _userRepository.AddAsync(newUser);
 

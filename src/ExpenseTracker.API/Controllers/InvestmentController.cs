@@ -21,7 +21,16 @@ public class InvestmentController : ApiController
         _mapper = mapper;
     }
 
+    // [HttpGet]
+    // public async Task<IActionResult> InvestmentFeed([FromQuery] GetInvestmentsRequest request)
+    // {
+    //     var query = _mapper.Map<GetInvestmentsQuery>(request);
+    //     var result = await _mediator.Send(query);
 
+    //     return result.Match(
+    //         successResult => Ok(_mapper.Map<GetInvestmentsResponse>(result.Value)),
+    //         error => Problem(statusCode: (int)error.First().Type, detail: error.First().Description));
+    // }
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] GetInvestmentsRequest request)
     {

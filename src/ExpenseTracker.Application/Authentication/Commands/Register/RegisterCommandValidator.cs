@@ -16,5 +16,9 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
             .NotEmpty();
         RuleFor(x => x.LastName)
             .NotEmpty();
+        RuleFor(x => x.Username)
+            .NotEmpty()
+            .MinimumLength(10)
+            .Matches(@"^(?!.*\b(firstname|lastname)\b).*").WithMessage("Username cannot contain 'firstname' or 'lastname'.");
     }
 }
