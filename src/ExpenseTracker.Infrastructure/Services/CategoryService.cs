@@ -12,15 +12,12 @@ namespace ExpenseTracker.Infrastructure.Services;
 public class CategoryService : ICategoryService
 {
     private readonly ICacheService _redisCacheService;
-    private readonly IInvestmentCategoryRepository _investmentCategoryRepository;
-    private readonly IExpenseCategoryRepository _expenseCategoryRepository;
+    private readonly IDbRepository _dbRepository;
     public CategoryService(
-        IInvestmentCategoryRepository investmentCategoryRepository,
-        IExpenseCategoryRepository expenseCategoryRepository,
+        IDbRepository dbRepository,
         ICacheService redisCacheService)
     {
-        _investmentCategoryRepository = investmentCategoryRepository;
-        _expenseCategoryRepository = expenseCategoryRepository;
+        _dbRepository = dbRepository;
         _redisCacheService = redisCacheService;
     }
 
@@ -34,7 +31,10 @@ public class CategoryService : ICategoryService
             return (cachedData, cachedData.Count());
         }
 
-        var data = await _expenseCategoryRepository.GetExpenseCategoriesAsync(page, pageSize);
+        string sql = @"
+        SELECT Id, Name FROM ExpenseCategories
+        LIMIT @PageSize OFFSET @Offset";
+        var data = await _dbRepository.QueryAsync<CategoryResult>(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
         await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
@@ -47,8 +47,10 @@ public class CategoryService : ICategoryService
         {
             return (cachedData, cachedData.Count());
         }
-
-        var data = await _investmentCategoryRepository.GetInvestmentCategoriesAsync(page, pageSize);
+        string sql = @"
+        SELECT Id, Name FROM InvestmentCategories
+        LIMIT @PageSize OFFSET @Offset";
+        var data = await _dbRepository.QueryAsync<CategoryResult>(sql, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
         await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
@@ -62,8 +64,8 @@ public class CategoryService : ICategoryService
         {
             return cachedData;
         }
-
-        var expenseCategory = await _expenseCategoryRepository.GetExpenseCategoryByIdAsync(id);
+        string sql = $"SELECT Id, Name FROM ExpenseCategories WHERE Id = @Id";
+        var expenseCategory = await _dbRepository.QueryFirstOrDefaultAsync<CategoryResult>(sql, new { Id = id });
         if (expenseCategory == null)
         {
             return Errors.Category.NotFound;
@@ -82,7 +84,8 @@ public class CategoryService : ICategoryService
         {
             return cachedData;
         }
-        var investmentCategory = await _investmentCategoryRepository.GetInvestmentCategoryByIdAsync(id);
+        string sql = $"SELECT Id, Name FROM InvestmentCategories WHERE Id = @Id";
+        var investmentCategory = await _dbRepository.QueryFirstOrDefaultAsync<CategoryResult>(sql, new { Id = id });
         if (investmentCategory == null)
         {
             return Errors.Category.NotFound;

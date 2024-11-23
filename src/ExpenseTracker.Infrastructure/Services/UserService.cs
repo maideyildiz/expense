@@ -18,7 +18,7 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IDbRepository _dbRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICacheService _redisCacheService;
@@ -27,13 +27,13 @@ public class UserService : IUserService
     private string GetUserDetailsByIdCacheKey(Guid id) => $"GetUserDetailsByIdAsync_{id}";
 
     public UserService(
+        IDbRepository dbRepository,
         IJwtTokenGenerator jwtTokenGenerator,
-        IUserRepository userRepository,
         IHttpContextAccessor httpContextAccessor,
         ICacheService redisCacheService)
     {
+        _dbRepository = dbRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
-        _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
         _redisCacheService = redisCacheService;
     }
@@ -60,7 +60,7 @@ public class UserService : IUserService
         }
 
         var sql = "SELECT * FROM Users WHERE Email = @Email";
-        var user = await _userRepository.GetByQueryAsync(sql, new { Email = query.Email });
+        var user = await _dbRepository.QueryFirstOrDefaultAsync<User>(sql, new { Email = query.Email });
 
         if (user is null || !user.IsActive || !PasswordHasher.VerifyPassword(query.Password, user.PasswordHash))
         {
@@ -75,15 +75,17 @@ public class UserService : IUserService
     public async Task<ErrorOr<string>> RegisterUserAsync(RegisterCommand command)
     {
         var sql = "SELECT * FROM Users WHERE Email = @Email";
-        var existingUser = await _userRepository.GetByQueryAsync(sql, new { Email = command.Email });
+        var existingUser = await _dbRepository.QueryFirstOrDefaultAsync<User>(sql, new { Email = command.Email });
         if (existingUser?.Id != null)
         {
             return Errors.Authentication.InvalidCredentials;
         }
         var passwordHash = PasswordHasher.HashPassword(command.Password);
         var newUser = User.Create(command.FirstName, command.LastName, command.Email, command.Username, passwordHash, command.CityId);
-
-        await _userRepository.AddAsync(newUser);
+        var insertClause = string.Join(", ", typeof(User).GetProperties().Select(p => p.Name));
+        var valuesClause = string.Join(", ", typeof(User).GetProperties().Select(p => $"@{p.Name}"));
+        string insertSql = $"INSERT INTO Users ({insertClause}) VALUES ({valuesClause})";
+        await _dbRepository.ExecuteAsync(insertSql, newUser);
 
         var token = _jwtTokenGenerator.GenerateToken(newUser);
 
@@ -98,7 +100,12 @@ public class UserService : IUserService
         {
             return cachedData;
         }
-        var userDetails = await _userRepository.GetUserDetailsAsync(userId);
+        var query = @"
+            SELECT u.Id, u.FirstName, u.LastName, u.Email, u.MonthlySalary, u.YearlySalary, c.Name AS CityName
+            FROM Users u
+            LEFT JOIN Cities c ON u.CityId = c.Id
+            WHERE u.Id = @Id";
+        var userDetails = await _dbRepository.QueryFirstOrDefaultAsync<UserResult>(query, new { UserId = userId });
         if (userDetails == null)
         {
             return Errors.User.UserNotFound;
@@ -117,7 +124,8 @@ public class UserService : IUserService
         }
         else
         {
-            user = await _userRepository.GetByIdAsync(userId);
+            var sql = "SELECT * FROM Users WHERE Email = @Email";
+            user = await _dbRepository.QueryFirstOrDefaultAsync<User>(sql, new { Email = userId });
         }
         if (user == null)
         {
@@ -134,11 +142,22 @@ public class UserService : IUserService
             command.YearlySalary,
             command.IsActive);
 
-        if (await _userRepository.UpdateAsync(user) > 0)
+        var updateSql = @"
+            UPDATE Users
+            SET FirstName = @FirstName,
+                LastName = @LastName,
+                Email = @Email,
+                PasswordHash = @PasswordHash,
+                CityId = @CityId,
+                MonthlySalary = @MonthlySalary,
+                YearlySalary = @YearlySalary,
+                IsActive = @IsActive
+            WHERE Id = @Id";
+        if (await _dbRepository.ExecuteAsync(updateSql, user) > 0)
         {
             await _redisCacheService.RemoveAsync(GetUserByEmailCacheKey(user.Email));
             await _redisCacheService.RemoveAsync(GetUserByIdCacheKey(userId));
-            return await _userRepository.GetUserDetailsAsync(userId);
+            return await GetUserDetailsAsync(userId);
         }
         else
         {

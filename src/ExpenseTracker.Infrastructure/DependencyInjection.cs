@@ -35,14 +35,6 @@ public static class DependencyInjection
         services.AddDbConnection(configuration);
         services.AddRedis(configuration);
         services.AddCustomLogging(configuration);
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        services.AddScoped<IInvestmentCategoryRepository, InvestmentCategoryRepository>();
-        services.AddScoped<IExpenseCategoryRepository, ExpenseCategoryRepository>();
-        services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<ICityRepository, CityRepository>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IExpenseRepository, ExpenseRepository>();
-        services.AddScoped<IInvestmentRepository, InvestmentRepository>();
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<ICityService, CityService>();
         services.AddScoped<IUserService, UserService>();
