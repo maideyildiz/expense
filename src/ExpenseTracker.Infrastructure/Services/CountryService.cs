@@ -12,14 +12,14 @@ namespace ExpenseTracker.Infrastructure.Services;
 public class CountryService : ICountryService
 {
     private readonly ICacheService _redisCacheService;
-    private readonly ICountryRepository _countryRepository;
+    private readonly IDbRepository _dbRepository;
 
     public CountryService(
         ICacheService redisCacheService,
-        ICountryRepository countryRepository)
+        IDbRepository dbRepository)
     {
         _redisCacheService = redisCacheService;
-        _countryRepository = countryRepository;
+        _dbRepository = dbRepository;
     }
 
     public async Task<(IEnumerable<GetCountryResult> Items, int TotalCount)> GetCountriesAsync(int page, int pageSize)
@@ -32,7 +32,12 @@ public class CountryService : ICountryService
             return (cachedData, cachedData.Count());
         }
 
-        var data = await _countryRepository.GetCountriesAsync(page, pageSize);
+        string query = @"
+        SELECT c.Id, c.Name
+        FROM Countries c
+        LIMIT @PageSize OFFSET @Offset";
+
+        var data = await _dbRepository.QueryAsync<GetCountryResult>(query, new { PageSize = pageSize, Offset = (page - 1) * pageSize });
         await _redisCacheService.SetAsync(cacheKey, data);
         return (data, data.Count());
     }
@@ -45,8 +50,8 @@ public class CountryService : ICountryService
         {
             return cachedData;
         }
-
-        var country = await _countryRepository.GetCountryByIdAsync(id);
+        string sql = $"SELECT Id, Name FROM Countries WHERE Id = @Id";
+        var country = await _dbRepository.QueryFirstOrDefaultAsync<GetCountryResult>(sql, new { Id = id });
         if (country == null)
         {
             return Errors.Country.NotFound;

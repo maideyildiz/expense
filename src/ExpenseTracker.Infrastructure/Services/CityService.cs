@@ -13,14 +13,14 @@ namespace ExpenseTracker.Infrastructure.Services;
 public class CityService : ICityService
 {
     private readonly ICacheService _redisCacheService;
-    private readonly ICityRepository _cityRepository;
+    private readonly IDbRepository _dbRepository;
 
     public CityService(
         ICacheService redisCacheService,
-        ICityRepository cityRepository)
+        IDbRepository dbRepository)
     {
         _redisCacheService = redisCacheService;
-        _cityRepository = cityRepository;
+        _dbRepository = dbRepository;
     }
 
     public async Task<(IEnumerable<GetCityResult> Items, int TotalCount)> GetCitiesByCountryIdAsync(Guid countryId, int page, int pageSize)
@@ -31,7 +31,15 @@ public class CityService : ICityService
         {
             return (cachedData, cachedData.Count());
         }
-        var cities = await _cityRepository.GetCitiesByCountryIdAsync(countryId, page, pageSize);
+
+        string query = @"
+        SELECT c.Id, c.Name
+        FROM Cities c
+        LEFT JOIN Countries co ON c.CountryId = co.Id
+        WHERE co.Id = @CountryId
+        LIMIT @PageSize OFFSET @Offset";
+
+        var cities = await _dbRepository.QueryAsync<GetCityResult>(query, new { CountryId = countryId, PageSize = pageSize, Offset = (page - 1) * pageSize });
         await _redisCacheService.SetAsync(cacheKey, cities);
         return (cities, cities.Count());
     }
@@ -44,8 +52,8 @@ public class CityService : ICityService
         {
             return cachedData;
         }
-
-        var city = await _cityRepository.GetCityByIdAsync(id);
+        string sql = $"SELECT Id, Name FROM Cities WHERE Id = @Id";
+        var city = await _dbRepository.QueryFirstOrDefaultAsync<GetCityResult>(sql, new { Id = id });
         if (city == null)
         {
             return Errors.City.NotFound;

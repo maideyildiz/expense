@@ -13,16 +13,16 @@ namespace ExpenseTracker.Infrastructure.Services;
 public class InvestmentService : IInvestmentService
 {
     private readonly ICacheService _redisCacheService;
-    private readonly IInvestmentRepository _investmentRepository;
+    private readonly IDbRepository _dbRepository;
     private string GetInvestmentsCacheKey(Guid userId) => $"GetInvestmentsAsync_{userId}";
     private string GetInvestmentByIdCacheKey(Guid id) => $"GetInvestmentByIdAsync_{id}";
 
     public InvestmentService(
         ICacheService redisCacheService,
-        IInvestmentRepository investmentRepository)
+        IDbRepository dbRepository)
     {
         _redisCacheService = redisCacheService;
-        _investmentRepository = investmentRepository;
+        _dbRepository = dbRepository;
     }
 
     public async Task<ErrorOr<Guid>> AddInvestmentAsync(CreateInvestmentCommand command, Guid userId)
@@ -32,8 +32,8 @@ public class InvestmentService : IInvestmentService
             command.Description,
             userId,
             command.CategoryId);
-
-        var result = await _investmentRepository.AddAsync(investment);
+        string sql = "INSERT INTO Investments (Amount, Description, UserId, CategoryId) VALUES (@Amount, @Description, @UserId, @CategoryId)";
+        var result = await _dbRepository.ExecuteAsync(sql, new { investment.Amount, investment.Description, investment.UserId, investment.CategoryId });
         if (result <= 0)
         {
             return Errors.Investment.InvestmentCreationFailed;
@@ -47,8 +47,9 @@ public class InvestmentService : IInvestmentService
 
     public async Task<bool> CheckIfUserOwnsInvestment(Guid userId, Guid investmentId)
     {
-        Guid investmentUserId = await _investmentRepository.GetInvestmentUserIdAsync(investmentId);
-        if (investmentUserId == Guid.Empty || investmentUserId != userId)
+        string sql = "SELECT Count(*) FROM Investments WHERE Id = @Id AND UserId = @UserId";
+        int count = await _dbRepository.ExecuteScalarAsync<int>(sql, new { Id = investmentId, UserId = userId });
+        if (count > 0)
         {
             return false;
         }
@@ -60,12 +61,14 @@ public class InvestmentService : IInvestmentService
 
     public async Task<ErrorOr<bool>> DeleteInvestmentAsync(Guid id)
     {
-        Investment investment = await _investmentRepository.GetByIdAsync(id);
+        string sql = "SELECT * FROM Investments WHERE Id = @Id";
+        Investment investment = await _dbRepository.QueryFirstOrDefaultAsync<Investment>(sql, new { Id = id });
         if (investment == null)
         {
             return Errors.Investment.InvestmentNotFound;
         }
-        var result = await _investmentRepository.DeleteAsync(id);
+        string deleteSql = "DELETE FROM Investments WHERE Id = @Id";
+        var result = await _dbRepository.ExecuteAsync(deleteSql, new { id = id });
         if (result <= 0)
         {
             return Errors.Investment.InvestmentNotFound;
@@ -86,7 +89,12 @@ public class InvestmentService : IInvestmentService
         {
             return cachedData;
         }
-        var investment = await _investmentRepository.GetInvestmentByIdAsync(id);
+        string sql = @"
+            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
+            FROM Investments e
+            LEFT JOIN InvestmentCategories c ON e.CategoryId = c.Id
+            WHERE e.Id = @Id";
+        var investment = await _dbRepository.QueryFirstOrDefaultAsync<InvestmentResult>(sql, new { Id = id });
         if (investment == null)
         {
             return Errors.Investment.InvestmentNotFound;
@@ -103,7 +111,14 @@ public class InvestmentService : IInvestmentService
         {
             return (cachedData, cachedData.Count());
         }
-        var investments = await _investmentRepository.GetInvestmentsByUserIdAsync(userId, page, pageSize);
+        var query = @"
+            SELECT i.Id, i.Amount, i.Description, i.UpdatedAt, c.Name AS CategoryName, i.UserId
+            FROM Investments i
+            LEFT JOIN InvestmentCategories c ON i.CategoryId = c.Id
+            WHERE i.Id = @Id
+            LIMIT @PageSize OFFSET @Offset";
+
+        var investments = await _dbRepository.QueryAsync<InvestmentResult>(query, new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });
         await _redisCacheService.SetAsync(cacheKey, investments);
         return (investments, investments.Count());
     }
@@ -119,14 +134,19 @@ public class InvestmentService : IInvestmentService
         }
         else
         {
-            investment = await _investmentRepository.GetByIdAsync(command.Id);
+            string sql = "SELECT * FROM Investments WHERE Id = @Id";
+            investment = await _dbRepository.QueryFirstOrDefaultAsync<Investment>(sql, new { Id = command.Id });
         }
         if (investment == null)
         {
             return Errors.Investment.InvestmentNotFound;
         }
         investment.Update(command.Amount, command.Description, command.CategoryId);
-        if (await _investmentRepository.UpdateAsync(investment) > 0)
+        string updateSql = @"
+            UPDATE Investments
+            SET Amount = @Amount, Description = @Description, CategoryId = @CategoryId
+            WHERE Id = @Id";
+        if (await _dbRepository.ExecuteAsync(updateSql, investment) > 0)
         {
             await _redisCacheService.RemoveAsync(GetInvestmentByIdCacheKey(investment.Id));
             await _redisCacheService.RemoveAsync(GetInvestmentsCacheKey(investment.UserId));

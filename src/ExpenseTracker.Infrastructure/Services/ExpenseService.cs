@@ -13,15 +13,15 @@ namespace ExpenseTracker.Infrastructure.Services;
 
 public class ExpenseService : IExpenseService
 {
-    private readonly IExpenseRepository _expenseRepository;
+    private readonly IDbRepository _dbRepository;
     private readonly ICacheService _redisCacheService;
     private string GetExpensesCacheKey(Guid userId) => $"GetExpensesAsync_{userId}";
     private string GetExpenseByIdCacheKey(Guid id) => $"GetExpenseByIdAsync_{id}";
     public ExpenseService(
-        IExpenseRepository expenseRepository,
+        IDbRepository dbRepository,
         ICacheService redisCacheService)
     {
-        _expenseRepository = expenseRepository;
+        _dbRepository = dbRepository;
         _redisCacheService = redisCacheService;
     }
     public async Task<ErrorOr<Guid>> AddExpenseAsync(CreateExpenseCommand command, Guid userId)
@@ -31,8 +31,11 @@ public class ExpenseService : IExpenseService
             command.Description,
             command.CategoryId,
             userId);
-
-        var result = await _expenseRepository.AddAsync(expense);
+        var addSql = @"
+            INSERT INTO Expenses (Amount, Description, CategoryId, UserId)
+            VALUES (@Amount, @Description, @CategoryId, @UserId)
+            RETURNING Id";
+        var result = await _dbRepository.ExecuteAsync(addSql, expense);
         if (result <= 0)
         {
             return Errors.Expense.ExpenseCreationFailed;
@@ -46,12 +49,14 @@ public class ExpenseService : IExpenseService
 
     public async Task<ErrorOr<bool>> DeleteExpenseAsync(Guid id)
     {
-        Expense expense = await _expenseRepository.GetByIdAsync(id);
+        string sql = "SELECT * FROM Expenses WHERE Id = @Id";
+        Expense expense = await _dbRepository.QueryFirstOrDefaultAsync<Expense>(sql, new { Id = id });
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
-        var result = await _expenseRepository.DeleteAsync(id);
+        string deleteSql = "DELETE FROM Expenses WHERE Id = @Id";
+        var result = await _dbRepository.ExecuteAsync(deleteSql, new { id = id });
         if (result <= 0)
         {
             return Errors.Expense.ExpenseDeletionFailed;
@@ -72,7 +77,12 @@ public class ExpenseService : IExpenseService
         {
             return cachedData;
         }
-        var expense = await _expenseRepository.GetExpenseByIdAsync(id);
+        string sql = @"
+            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
+            FROM Expenses e
+            LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
+            WHERE e.Id = @Id";
+        var expense = await _dbRepository.QueryFirstOrDefaultAsync<ExpenseResult>(sql, new { Id = id });
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
@@ -89,7 +99,14 @@ public class ExpenseService : IExpenseService
         {
             return (cachedData, cachedData.Count());
         }
-        var expenses = await _expenseRepository.GetExpensesByUserIdAsync(userId, page, pageSize);
+        var query = @"
+            SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
+            FROM Expenses e
+            LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
+            WHERE e.Id = @Id
+            LIMIT @PageSize OFFSET @Offset";
+        var expenses = await _dbRepository.QueryAsync<ExpenseResult>(query, new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });
+
         await _redisCacheService.SetAsync(cacheKey, expenses);
         return (expenses, expenses.Count());
     }
@@ -105,14 +122,19 @@ public class ExpenseService : IExpenseService
         }
         else
         {
-            expense = await _expenseRepository.GetByIdAsync(command.Id);
+            string sql = "SELECT * FROM Expenses WHERE Id = @Id";
+            expense = await _dbRepository.QueryFirstOrDefaultAsync<Expense>(sql, new { Id = command.Id });
         }
         if (expense == null)
         {
             return Errors.Expense.ExpenseNotFound;
         }
         expense.Update(command.Amount, command.Description, command.CategoryId);
-        if (await _expenseRepository.UpdateAsync(expense) > 0)
+        string updateSql = @"
+            UPDATE Expenses
+            SET Amount = @Amount, Description = @Description, CategoryId = @CategoryId
+            WHERE Id = @Id";
+        if (await _dbRepository.ExecuteAsync(updateSql, expense) > 0)
         {
             await _redisCacheService.RemoveAsync(GetExpenseByIdCacheKey(expense.Id));
             await _redisCacheService.RemoveAsync(GetExpensesCacheKey(expense.UserId));
@@ -126,8 +148,9 @@ public class ExpenseService : IExpenseService
 
     public async Task<bool> CheckIfUserOwnsExpense(Guid userId, Guid expenseId)
     {
-        Guid expenseUserId = await _expenseRepository.GetExpenseUserIdAsync(expenseId);
-        if (expenseUserId == Guid.Empty || expenseUserId != userId)
+        string sql = "SELECT Count(*) FROM Expenses WHERE Id = @Id AND UserId = @UserId";
+        int count = await _dbRepository.ExecuteScalarAsync<int>(sql, new { Id = expenseId, UserId = userId });
+        if (count > 0)
         {
             return false;
         }
