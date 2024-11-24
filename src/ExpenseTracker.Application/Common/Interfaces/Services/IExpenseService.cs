@@ -1,10 +1,8 @@
-using ErrorOr;
-
 using ExpenseTracker.Application.ExpenseOperations.Commands.Common;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Create;
 using ExpenseTracker.Application.ExpenseOperations.Commands.Update;
 using ExpenseTracker.Core.Entities;
-
+using ErrorOr;
 namespace ExpenseTracker.Application.Common.Interfaces.Services;
 
 public interface IExpenseService
