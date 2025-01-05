@@ -76,16 +76,16 @@ public class UserService : IUserService
     {
         var sql = "SELECT * FROM Users WHERE Email = @Email";
         var existingUser = await _dbRepository.QueryFirstOrDefaultAsync<User>(sql, new { Email = command.Email });
-        if (existingUser?.Id != null)
+        var cityCheckSql = "SELECT * FROM Cities WHERE Id = @Id";
+        var cityCheck = await _dbRepository.QueryFirstOrDefaultAsync<City>(cityCheckSql, new { Id = command.CityId });
+        if (existingUser?.Id != null || cityCheck?.Id == null)
         {
             return Errors.Authentication.InvalidCredentials;
         }
         var passwordHash = PasswordHasher.HashPassword(command.Password);
         var newUser = User.Create(command.FirstName, command.LastName, command.Email, command.Username, passwordHash, command.CityId);
-        var insertClause = string.Join(", ", typeof(User).GetProperties().Select(p => p.Name));
-        var valuesClause = string.Join(", ", typeof(User).GetProperties().Select(p => $"@{p.Name}"));
-        string insertSql = $"INSERT INTO Users ({insertClause}) VALUES ({valuesClause})";
-        await _dbRepository.ExecuteAsync(insertSql, newUser);
+        string insertSql = "INSERT INTO Users (Id,FirstName, LastName, Email, Username, PasswordHash, CityId, IsActive, CreatedAt, UpdatedAt, LastLoginAt, MonthlySalary, YearlySalary) VALUES (@Id,@FirstName, @LastName, @Email, @Username, @PasswordHash, @CityId, @IsActive, @CreatedAt, @UpdatedAt, @LastLoginAt, @MonthlySalary, @YearlySalary)";
+        var result = await _dbRepository.ExecuteAsync(insertSql, new { newUser.Id, newUser.FirstName, newUser.LastName, newUser.Email, newUser.Username, passwordHash, newUser.CityId, newUser.IsActive, newUser.CreatedAt, newUser.UpdatedAt, newUser.LastLoginAt, newUser.MonthlySalary, newUser.YearlySalary });
 
         var token = _jwtTokenGenerator.GenerateToken(newUser);
 
