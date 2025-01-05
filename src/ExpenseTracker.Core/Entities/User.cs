@@ -88,8 +88,8 @@ namespace ExpenseTracker.Core.Entities
             LastName = lastName is not null ? lastName : LastName;
             Email = email is not null ? email : Email;
             PasswordHash = passwordHash is not null ? passwordHash : PasswordHash;
-            MonthlySalary = monthlySalary is not null ? monthlySalary.Value : MonthlySalary;
-            YearlySalary = yearlySalary is not null ? yearlySalary.Value : YearlySalary;
+            MonthlySalary = monthlySalary is not null ? monthlySalary.Value : decimal.Zero;
+            YearlySalary = yearlySalary is not null ? yearlySalary.Value : decimal.Zero;
             LastLoginAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
             IsActive = isActive is not null ? isActive.Value : IsActive;
