@@ -115,7 +115,7 @@ public class InvestmentService : IInvestmentService
             SELECT i.Id, i.Amount, i.Description, i.UpdatedAt, c.Name AS CategoryName, i.UserId
             FROM Investments i
             LEFT JOIN InvestmentCategories c ON i.CategoryId = c.Id
-            WHERE i.Id = @Id
+            WHERE i.UserId = @UserId
             LIMIT @PageSize OFFSET @Offset";
 
         var investments = await _dbRepository.QueryAsync<InvestmentResult>(query, new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });

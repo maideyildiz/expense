@@ -9,5 +9,7 @@ public record RegisterCommand(
     string Email,
     string Username,
     string Password,
-    Guid CityId)
+    Guid CityId,
+    decimal? MonthlySalary = decimal.Zero,
+    decimal? YearlySalary = decimal.Zero)
     : IRequest<ErrorOr<string>>;
