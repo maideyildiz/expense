@@ -103,7 +103,7 @@ public class ExpenseService : IExpenseService
             SELECT e.Id, e.Amount, e.Description, e.UpdatedAt, c.Name AS CategoryName, e.UserId
             FROM Expenses e
             LEFT JOIN ExpenseCategories c ON e.CategoryId = c.Id
-            WHERE e.Id = @Id
+            WHERE e.UserId = @UserId
             LIMIT @PageSize OFFSET @Offset";
         var expenses = await _dbRepository.QueryAsync<ExpenseResult>(query, new { UserId = userId, PageSize = pageSize, Offset = (page - 1) * pageSize });
 
