@@ -1,20 +1,21 @@
 # Use the official .NET SDK image for building the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
+WORKDIR /src
 
 # Copy the .csproj files and restore dependencies
-COPY ExpenseTracker.Core/*.csproj ./ExpenseTracker.Core/
-COPY ExpenseTracker.Infrastructure/*.csproj ./ExpenseTracker.Infrastructure/
-COPY ExpenseTracker.API/*.csproj ./ExpenseTracker.API/
-COPY ExpenseTracker.Tests/*.csproj ./ExpenseTracker.Tests/
-RUN dotnet restore ExpenseTracker.API/ExpenseTracker.API.csproj
+COPY ["src/ExpenseTracker.API/ExpenseTracker.API.csproj", "src/ExpenseTracker.API/"]
+COPY ["src/ExpenseTracker.Application/ExpenseTracker.Application.csproj", "src/ExpenseTracker.Application/"]
+COPY ["src/ExpenseTracker.Contracts/ExpenseTracker.Contracts.csproj", "src/ExpenseTracker.Contracts/"]
+COPY ["src/ExpenseTracker.Core/ExpenseTracker.Core.csproj", "src/ExpenseTracker.Core/"]
+COPY ["src/ExpenseTracker.Infrastructure/ExpenseTracker.Infrastructure.csproj", "src/ExpenseTracker.Infrastructure/"]
+RUN dotnet restore src/ExpenseTracker.API/ExpenseTracker.API.csproj
 
 # Copy the entire project files and publish the release version
 COPY . ./
-RUN dotnet publish ExpenseTracker.API/ExpenseTracker.API.csproj -c Release -o out
+RUN dotnet publish src/ExpenseTracker.API/ExpenseTracker.API.csproj -c Release -o /app/out
 
 # Use the official ASP.NET Core runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 # Copy the published files from the build environment

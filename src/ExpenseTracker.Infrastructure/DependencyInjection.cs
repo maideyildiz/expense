@@ -116,9 +116,15 @@ public static class DependencyInjection
         var redisSettings = new RedisSettings();
         configuration.Bind(RedisSettings.SectionName, redisSettings);
 
+        if (!redisSettings.Enabled)
+        {
+            services.AddScoped<ICacheService, NoOpCacheService>();
+            return services;
+        }
+
         if (string.IsNullOrWhiteSpace(redisSettings.ConnectionString))
         {
-            throw new ArgumentException("Redis connection string is not configured.");
+            throw new ArgumentException("Redis is enabled but its connection string is not configured.");
         }
 
         services.AddSingleton(redisSettings);
